@@ -1,0 +1,6 @@
+#
+# Include references to fastjet library
+# Based on https://github.com/JetsGame/GroomRL/issues/12
+#
+export LD_LIBRARY_PATH=/home/heiko/bin/fastjet-install/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=/home/heiko/bin/fastjet-install/lib/python3.7/site-packages:$PYTHONPATH
