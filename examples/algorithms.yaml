@@ -1,0 +1,19 @@
+- id: 'cmdML'
+  name: 'Command (ML)'
+  datatype: 'string'
+  defaultValue: 'python code/evaluate-models.py
+    --algorithm=${algorithm}
+    results/processed_test_jets.pkl
+    data/evaluate/
+    results'
+  index: 3
+- id: 'algorithm'
+  name: 'Algorithm'
+  datatype: 'string'
+  defaultValue: 'NiNRecNNReLU'
+  values:
+      - value: 'leaves_inner_RecNN'
+      - value: 'NiNRecNN'
+      - value: 'NiNRecNN2L3W'
+      - value: 'NiNRecNNReLU'
+  index: 4

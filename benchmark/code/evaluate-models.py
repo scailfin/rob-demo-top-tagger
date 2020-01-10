@@ -32,7 +32,7 @@ if __name__ == '__main__':
     # directory that contains the evaluation run parameter files, and the
     # outout base directory for run.
     # There are four optional command line arguments:
-    # - architecture (default: )
+    # - algorithm (default: )
     # - restore (default: best)
     # - n_start (default: 0)
     # - n_finish (default: 9)
@@ -40,7 +40,7 @@ if __name__ == '__main__':
         description='Evaluate models for trained weights.'
     )
     parser.add_argument(
-        '-a', '--architecture',
+        '-a', '--algorithm',
         default='NiNRecNNReLU',
         help='Model architecture identifier'
     )
@@ -66,7 +66,10 @@ if __name__ == '__main__':
     parser.add_argument('output_dir', help='Base directory for run results.')
     args = parser.parse_args()
     # Initialize the logger
-    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+    log = logging.getLogger()
+    log.addHandler(logging.StreamHandler(sys.stdout))
+    log_file = os.path.join(args.output_dir, fn.EVAL_LOG_FILE)
+    log.addHandler(logging.FileHandler(log_file))
     logging.getLogger().setLevel(logging.DEBUG)
     # Call evaluation function for each model
     start_time = time.time()
@@ -76,7 +79,7 @@ if __name__ == '__main__':
         eval.run(
             tree_file=args.tree_file,
             params=utils.Params(os.path.join(run_dir, fn.PARAMS_FILE)),
-            architecture=args.architecture,
+            architecture=args.algorithm,
             restore_file=os.path.join(run_dir, '{}.pth.tar'.format(args.restore)),
             output_dir=os.path.join(args.output_dir, run_id)
         )

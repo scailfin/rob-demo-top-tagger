@@ -75,3 +75,4 @@ target/
 
 # Benchmark run outputs
 outputs/
+benchmark/results/

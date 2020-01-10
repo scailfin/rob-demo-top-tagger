@@ -66,8 +66,11 @@ if __name__ == '__main__':
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
     # Initialize the logger
-    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-    logging.getLogger().setLevel(logging.DEBUG)
+    log = logging.getLogger()
+    log.addHandler(logging.StreamHandler(sys.stdout))
+    log_file = os.path.join(out_dir, fn.PREPROC_LOG_FILE)
+    log.addHandler(logging.FileHandler(log_file))
+    log.setLevel(logging.DEBUG)
     #
     # -- Step 1 ----------------------------------------------------------------
     # Run jets preprocessing task that uses FastJet to create the tree test

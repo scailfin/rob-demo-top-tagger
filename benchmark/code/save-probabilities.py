@@ -79,8 +79,11 @@ if __name__ == '__main__':
     data_dir = args[0]
     results_dir = args[1]
     # Initialize the logger
-    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-    logging.getLogger().setLevel(logging.DEBUG)
+    log = logging.getLogger()
+    log.addHandler(logging.StreamHandler(sys.stdout))
+    log_file = os.path.join(results_dir, fn.ANALYZE_LOG_FILE)
+    log.addHandler(logging.FileHandler(log_file))
+    log.setLevel(logging.DEBUG)
     # Parse result files and generate summary of outputs
     results = load_results(data_dir, results_dir, verbose=True)
     y_prob_best = np.asarray([element['yProbTrue'] for element in results])

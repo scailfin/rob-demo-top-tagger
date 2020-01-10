@@ -27,3 +27,10 @@ Y_PROB_TRUE_FILE = 'yProbTrue.pkl'
 """Result files for run summaries."""
 Y_PROB_BEST_FILE = 'yProbBest.pkl'
 RESULT_FILE = 'results.json'
+
+
+# -- Logging -------------------------------------------------------------------
+"""Logfile for dataset preprocessing step."""
+ANALYZE_LOG_FILE = 'analyze.log'
+EVAL_LOG_FILE = 'evaluate.log'
+PREPROC_LOG_FILE = 'preproc.log'
