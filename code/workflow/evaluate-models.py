@@ -6,6 +6,14 @@
 # ROB is free software; you can redistribute it and/or modify it under the
 # terms of the MIT License; see LICENSE file for more details.
 
+"""Default implementation for the model evaluation step in the Top Tagger
+workflow.
+
+usage: evaluate-models.py [-h] [-a ARCHITECTURE] [-r RESTORE] [-s N_START]
+                          [-f N_FINISH]
+                          tree_file data_dir output_dir
+"""
+
 import argparse
 import logging
 import numpy as np
@@ -13,7 +21,7 @@ import os
 import sys
 import time
 
-
+import files as fn
 import recnn.evaluate as eval
 import recnn.utils as utils
 
@@ -63,11 +71,11 @@ if __name__ == '__main__':
     # Call evaluation function for each model
     start_time = time.time()
     for n_run in np.arange(args.n_start, args.n_finish):
-        run_id = 'run_{}'.format(n_run)
+        run_id = '{}{}'.format(fn.RUN_DIR_PREFIX, n_run)
         run_dir = os.path.join(args.data_dir, run_id)
         eval.run(
             tree_file=args.tree_file,
-            params=utils.Params(os.path.join(run_dir, 'params.json')),
+            params=utils.Params(os.path.join(run_dir, fn.PARAMS_FILE)),
             architecture=args.architecture,
             restore_file=os.path.join(run_dir, '{}.pth.tar'.format(args.restore)),
             output_dir=os.path.join(args.output_dir, run_id)

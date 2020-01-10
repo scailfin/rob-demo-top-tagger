@@ -15,6 +15,7 @@ import pickle
 import time
 import torch
 
+import files as fn
 import recnn.model.data_loader as dl
 import recnn.utils as utils
 import recnn.model.dataset as dataset
@@ -57,7 +58,7 @@ def generate_results(y_test, y_score, batch_size, output_dir, weights=None):
         logging.info('Sample weights length={}'.format(len(weights)))
         logging.info('Sample weights[0:4]={}'.format(weights[0:4]))
     # Save fpr, tpr to output file
-    output_file = os.path.join(output_dir, 'roc.pkl')
+    output_file = os.path.join(output_dir, fn.ROC_FILE)
     with open(output_file, 'wb') as f:
         pickle.dump(zip(fpr,tpr), f)
     roc_auc = roc_auc_score(y_test, y_score)
@@ -144,7 +145,7 @@ def evaluate(
         weights=sample_weights
     )
     # Save output prob and true values
-    output_file = os.path.join(output_dir, 'yProbTrue.pkl')
+    output_file = os.path.join(output_dir, fn.Y_PROB_TRUE_FILE)
     with open(output_file, 'wb') as f:
         pickle.dump(zip(out_prob, labels), f)
     # compute mean of all metrics in summary
@@ -258,5 +259,5 @@ def run(tree_file, params, architecture, restore_file, output_dir):
         output_dir=output_dir,
         num_steps=num_steps_test
     )
-    output_file = os.path.join(output_dir, 'metrics_test.json')
+    output_file = os.path.join(output_dir, fn.METRICS_FILE)
     utils.save_dict_to_json(test_metrics, output_file)

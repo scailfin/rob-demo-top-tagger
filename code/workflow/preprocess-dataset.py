@@ -27,6 +27,7 @@ import os
 import sys
 
 import dataset.preprocess as pf
+import files as fn
 import recnn.preprocess as recnn
 
 
@@ -72,7 +73,7 @@ if __name__ == '__main__':
     # Run jets preprocessing task that uses FastJet to create the tree test
     # jets.
     #
-    tree_file = os.path.join(out_dir, 'tree_test_jets.pkl')
+    tree_file = os.path.join(out_dir, fn.RAW_TREE_FILE)
     pf.run(
         card_file=card_file,
         input_jets_file=input_jets_file,
@@ -86,5 +87,5 @@ if __name__ == '__main__':
     recnn.run(
         tree_file=tree_file,
         transformer_file=transformer_file,
-        output_file=os.path.join(out_dir, 'processed_test_jets.pkl')
+        output_file=os.path.join(out_dir, fn.PROCESSED_TREE_FILE)
     )
