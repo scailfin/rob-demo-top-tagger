@@ -103,7 +103,6 @@ if __name__ == '__main__':
     parser.add_argument('h5_file', help='Downloaded test data file.')
     parser.add_argument('array_file', help='Extracted jet array output file.')
     args = parser.parse_args()
-    print(args)
     # Initialize the logger
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     logging.getLogger().setLevel(logging.DEBUG)

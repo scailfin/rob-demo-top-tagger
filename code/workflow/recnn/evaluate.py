@@ -8,31 +8,29 @@
 
 """Evaluates the model"""
 
-import argparse
 import logging
-import os
 import numpy as np
-import torch
-import sys
-import time
+import os
 import pickle
+import time
+import torch
+
+import recnn.model.data_loader as dl
+import recnn.utils as utils
+import recnn.model.dataset as dataset
+
+from scipy import interp
 from sklearn.metrics import classification_report
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import roc_auc_score
-
 from sklearn.utils import check_random_state
 
-import model.data_loader as dl
-from model import recNet as net
-import utils
-from model import preprocess
-import model.dataset as dataset
-from scipy import interp
+from recnn.model import rec_net as net
 
 
 #-- Evaluation Functions -------------------------------------------------------
 
-def generate_results(y_test, y_score, batch_size, output_file, weights=None):
+def generate_results(y_test, y_score, batch_size, output_dir, weights=None):
     """Make ROC with area under the curve plot."""
     logging.info('length y_test={}'.format(len(y_test)))
     logging.info('Lenght y_score={}'.format(len(y_score)))
@@ -55,9 +53,11 @@ def generate_results(y_test, y_score, batch_size, output_file, weights=None):
     logging.info('Thresholds lenght = \n{}'.format(len(thresholds)))
     logging.info('fpr lenght{}'.format(len(fpr)))
     logging.info('tpr lenght{}'.format(len(tpr)))
-    logging.info('Sample weights length={}'.format(len(weights)))
-    logging.info('Sample weights[0:4]={}'.format(weights[0:4]))
+    if weights is not None:
+        logging.info('Sample weights length={}'.format(len(weights)))
+        logging.info('Sample weights[0:4]={}'.format(weights[0:4]))
     # Save fpr, tpr to output file
+    output_file = os.path.join(output_dir, 'roc.pkl')
     with open(output_file, 'wb') as f:
         pickle.dump(zip(fpr,tpr), f)
     roc_auc = roc_auc_score(y_test, y_score)
@@ -65,7 +65,10 @@ def generate_results(y_test, y_score, batch_size, output_file, weights=None):
     return roc_auc
 
 
-def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps, output_file, sample_weights=None):
+def evaluate(
+    model, loss_fn, data_iterator, metrics, params, num_steps, output_dir,
+    sample_weights=None
+):
     """Evaluate the model on `num_steps` batches.
     Args:
         model: (torch.nn.Module) the neural network superclass
@@ -137,11 +140,12 @@ def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps, output_f
         y_test=labels,
         y_score=out_prob,
         batch_size=params.batch_size,
-        output_file=output_file,
+        output_dir=output_dir,
         weights=sample_weights
     )
     # Save output prob and true values
-    with open(os.path.join(output_dir, 'yProbTrue.pkl', 'wb') as f:
+    output_file = os.path.join(output_dir, 'yProbTrue.pkl')
+    with open(output_file, 'wb') as f:
         pickle.dump(zip(out_prob, labels), f)
     # compute mean of all metrics in summary
     metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]}
@@ -154,27 +158,18 @@ def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps, output_f
 
 # -- Main Function -------------------------------------------------------------
 
-def run(input_file, params, architecture, restore_file, output_dir):
-    # Start pre-processing job. Main code block with the methods to load the
-    # raw data, create and preprocess the trees.
+def run(tree_file, params, architecture, restore_file, output_dir):
+    # Ensure that the output directory exists
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+    # Start evaluation job.
     logging.info('Preprocessing jet trees ...')
-    start_time = time.time()
-
-
-    cmd_eval = "CUDA_VISIBLE_DEVICES={gpu} {python} evaluate.py --model_dir={model_dir} --data_dir={data_dir} --sample_name={sample_name} --jet_algorithm={algo} --architecture={architecture} --restore_file={restore_file}".format(gpu=GPU, python=PYTHON, model_dir=model_dir, data_dir=eval_data_dir,sample_name=sample_name, algo=algo, architecture=architecture, restore_file=restore_file)
-
-    # use GPU if available
+    # Use GPU if available
     params.cuda = torch.cuda.is_available()
     # Set the random seed for reproducible experiments
     if params.cuda:
         torch.cuda.seed()
-    # Main class with the methods to load the raw data and create the batches
-    data_loader=dl.DataLoader
-    ## Load batches of test data
-    logging.info('Loading the dataset {}'.format(input_file))
-    with open(input_file, 'rb') as f:
-        test_data = pickle.load(f)
-    # Architecture. Define the model and optimizer
+    # Initialize the model for the given architecture identifier
     if architecture=='simpleRecNN':
         model = net.PredictFromParticleEmbedding(
             params,
@@ -217,10 +212,15 @@ def run(input_file, params, architecture, restore_file, output_dir):
     # Loss function
     loss_fn = torch.nn.BCELoss()
     metrics = net.metrics
+    # Load batches of test data
+    data_loader=dl.DataLoader
+    logging.info('Loading the dataset {}'.format(tree_file))
+    with open(tree_file, 'rb') as f:
+        test_data = pickle.load(f)
     #
     # EVALUATE
     #
-    logging.info("Starting evaluation")
+    logging.info('Starting evaluation')
     # Reload weights from the saved file
     utils.load_checkpoint(restore_file, model)
     test_data = list(test_data)
@@ -255,11 +255,8 @@ def run(input_file, params, architecture, restore_file, output_dir):
         data_iterator=test_loader,
         metrics=metrics,
         params=params,
-        output_file=output_file,
+        output_dir=output_dir,
         num_steps=num_steps_test
     )
+    output_file = os.path.join(output_dir, 'metrics_test.json')
     utils.save_dict_to_json(test_metrics, output_file)
-
-    # Log runtime information
-    exec_time = time.time()-start_time
-    logging.info('Preprocessing time (minutes) = {}'.format(exec_time/60))
