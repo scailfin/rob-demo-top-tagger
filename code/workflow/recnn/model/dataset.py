@@ -1,4 +1,11 @@
-# import pandas as pd
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB) - Top Tagger Benchmark Demo.
+#
+# Copyright (C) [2019-2020] NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 import numpy as np
 import torch
 import torch.utils.data as data
@@ -16,17 +23,17 @@ class TreeDataset(data.Dataset):
     transform: function that we want to apply to the data. For trees, this will be that function that creates the training batches
     batch_size: size of the training batches
     features: Number of features in each node
-  ''' 
+  '''
   ##----
   def __init__(self,data=None,labels=None,shuffle=True,transform=None,batch_size=None,features=None):
-  
+
     self.data=data
     self.labels=labels
     self.transform=transform
     self.batch_size=batch_size
     self.features=features
-  
-    if shuffle:   
+
+    if shuffle:
       indices = check_random_state(seed=None).permutation(len(self.data))
 #       print('self.data=',self.data[0]['tree'])
 #       print('self.labels=',self.labels)
@@ -39,7 +46,7 @@ class TreeDataset(data.Dataset):
   ##----
   # Override __getitem__
   def __getitem__(self,index):
-  
+
     if self.transform is not None:
       levels, children, n_inners, contents, n_level= self.transform(self.data[index*self.batch_size:(index+1)*self.batch_size],self.features)
 
@@ -66,21 +73,13 @@ def customized_collate(batch):
   These **needs** to be in global scope since Py2 doesn't support serializing
   static methods.
   Here we define customized_collate that returns the elements of each batch tuple shifted to pytorch tensors.
-  """  
-  
+  """
+
   levels=torch.LongTensor(batch[0][0])
   children=torch.LongTensor(batch[0][1])
   n_inners=torch.LongTensor(batch[0][2])
   contents = torch.FloatTensor(batch[0][3])
   n_level=torch.LongTensor(batch[0][4])
   labels= torch.LongTensor(batch[0][5])
-  
+
   return levels, children, n_inners, contents, n_level, labels
-
-
-
-
-
-
-
-

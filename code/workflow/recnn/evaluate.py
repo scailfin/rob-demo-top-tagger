@@ -1,3 +1,11 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB) - Top Tagger Benchmark Demo.
+#
+# Copyright (C) [2019-2020] NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """Evaluates the model"""
 
 import argparse
@@ -146,8 +154,15 @@ def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps, output_f
 
 # -- Main Function -------------------------------------------------------------
 
-def main(input_file, params, architecture, restore_file, output_file):
-  """Evaluate the model on the test set."""
+def run(input_file, params, architecture, restore_file, output_dir):
+    # Start pre-processing job. Main code block with the methods to load the
+    # raw data, create and preprocess the trees.
+    logging.info('Preprocessing jet trees ...')
+    start_time = time.time()
+
+
+    cmd_eval = "CUDA_VISIBLE_DEVICES={gpu} {python} evaluate.py --model_dir={model_dir} --data_dir={data_dir} --sample_name={sample_name} --jet_algorithm={algo} --architecture={architecture} --restore_file={restore_file}".format(gpu=GPU, python=PYTHON, model_dir=model_dir, data_dir=eval_data_dir,sample_name=sample_name, algo=algo, architecture=architecture, restore_file=restore_file)
+
     # use GPU if available
     params.cuda = torch.cuda.is_available()
     # Set the random seed for reproducible experiments
@@ -244,3 +259,7 @@ def main(input_file, params, architecture, restore_file, output_file):
         num_steps=num_steps_test
     )
     utils.save_dict_to_json(test_metrics, output_file)
+
+    # Log runtime information
+    exec_time = time.time()-start_time
+    logging.info('Preprocessing time (minutes) = {}'.format(exec_time/60))

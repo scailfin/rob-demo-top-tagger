@@ -1,3 +1,11 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB) - Top Tagger Benchmark Demo.
+#
+# Copyright (C) [2019-2020] NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 import json
 import logging
 import os
@@ -138,16 +146,16 @@ def load_checkpoint(checkpoint, model, optimizer=None):
     """
     if not os.path.exists(checkpoint):
         raise ValueError("File doesn't exist {}".format(checkpoint))
-        
-    
-    if torch.cuda.is_available(): 
+
+
+    if torch.cuda.is_available():
       checkpoint = torch.load(checkpoint)
-      model.load_state_dict(checkpoint['state_dict'])  
+      model.load_state_dict(checkpoint['state_dict'])
     else:
       device= torch.device('cpu')
       model.load_state_dict(torch.load(checkpoint, map_location=device)['state_dict'])
-    
-    
+
+
 
     if optimizer:
         optimizer.load_state_dict(checkpoint['optim_dict'])

@@ -1,5 +1,5 @@
 # This file is part of the Reproducible Open Benchmarks for Data Analysis
-# Platform (ROB).
+# Platform (ROB) - Top Tagger Benchmark Demo.
 #
 # Copyright (C) [2019-2020] NYU.
 #
