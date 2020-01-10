@@ -71,6 +71,6 @@ Install additional packages. Strangely, istalling PyTables using conda did not w
 
 Download and extract competition input data. For convenience, a version of the data is in included in the repository (downloaded on Jan. 9, 2020).
 
-.. code-block: bash
+.. code-block:: bash
 
     python download-comp-data.py 400000 /tmp/test.h5 ../../data/jets/test_jets.pkl
