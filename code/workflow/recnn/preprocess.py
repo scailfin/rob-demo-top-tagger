@@ -17,7 +17,6 @@ import sys
 import time
 
 import recnn.model.data_loader as dl
-import recnn.utils as utils
 
 from recnn.model import preprocess
 
@@ -25,18 +24,6 @@ from recnn.model import preprocess
 # -- Main preprocessing function -----------------------------------------------
 
 def run(params, input_tree_file, transformer_file, output_file):
-    # Adjust parameters for preprocessing job
-    params.number_of_labels_types=1
-    params.learning_rate=2e-3
-    params.decay=0.9
-    params.batch_size=400
-    params.save_summary_steps=400
-    params.num_epochs=40
-    params.hidden=50
-    params.features=7
-    params.myN_jets=1200000
-    params.nrun_start=0
-    params.nrun_finish=1
     # Start pre-processing job. Main code block with the methods to load the
     # raw data, create and preprocess the trees.
     logging.info('Preprocessing jet trees ...')

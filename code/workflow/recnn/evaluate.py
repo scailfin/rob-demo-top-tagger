@@ -24,7 +24,7 @@ from scipy import interp
 
 #-- Evaluation Functions -------------------------------------------------------
 
-def generate_results(output_dir, y_test, y_score, params,weights=None):
+def generate_results(y_test, y_score, batch_size, output_file, weights=None):
     """Make ROC with area under the curve plot."""
     logging.info('length y_test={}'.format(len(y_test)))
     logging.info('Lenght y_score={}'.format(len(y_score)))
@@ -32,10 +32,9 @@ def generate_results(output_dir, y_test, y_score, params,weights=None):
         logging.info('Sample weights length={}'.format(len(weights)))
         # We include the weights until the last full batch (the remaining ones
         # are not enough to make a full batch)
-        last_weight = len(weights) - len(weights) % params.batch_size
+        last_weight = len(weights) - len(weights) % batch_size
         weights = weights[0:last_weight]
         logging.info('New sample weights length={}'.format(len(weights)))
-    ROC_plots_dir=output_dir+'/'
     fpr, tpr, thresholds = roc_curve(
         y_test,
         y_score,
@@ -50,8 +49,7 @@ def generate_results(output_dir, y_test, y_score, params,weights=None):
     logging.info('tpr lenght{}'.format(len(tpr)))
     logging.info('Sample weights length={}'.format(len(weights)))
     logging.info('Sample weights[0:4]={}'.format(weights[0:4]))
-    # # Save fpr, tpr to output file
-    output_file = os.path.join(output_dir, 'roc.pkl')
+    # Save fpr, tpr to output file
     with open(output_file, 'wb') as f:
         pickle.dump(zip(fpr,tpr), f)
     roc_auc = roc_auc_score(y_test, y_score)
@@ -59,7 +57,7 @@ def generate_results(output_dir, y_test, y_score, params,weights=None):
     return roc_auc
 
 
-def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps, sample_weights=None):
+def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps, output_file, sample_weights=None):
     """Evaluate the model on `num_steps` batches.
     Args:
         model: (torch.nn.Module) the neural network superclass
@@ -127,7 +125,13 @@ def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps, sample_w
     logging.info('len labels after ={}'.format(len(labels)))
     logging.info('len out_prob after{}'.format(len(out_prob)))
     # Get fpr, tpr, ROC curve and AUC
-    roc_auc = generate_results(labels, out_prob, params,weights=sample_weights)
+    roc_auc = generate_results(
+        y_test=labels,
+        y_score=out_prob,
+        batch_size=params.batch_size,
+        output_file=output_file,
+        weights=sample_weights
+    )
     # Save output prob and true values
     with open(os.path.join(output_dir, 'yProbTrue.pkl', 'wb') as f:
         pickle.dump(zip(out_prob, labels), f)
@@ -140,71 +144,103 @@ def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps, sample_w
     return metrics_mean
 
 
-def main(params, data_dir, algo, architecture, restore_file, output_dir):
-  """Evaluate the model on the test set."""
+# -- Main Function -------------------------------------------------------------
 
+def main(input_file, params, architecture, restore_file, output_file):
+  """Evaluate the model on the test set."""
     # use GPU if available
     params.cuda = torch.cuda.is_available()
     # Set the random seed for reproducible experiments
     if params.cuda:
         torch.cuda.seed()
-
     # Main class with the methods to load the raw data and create the batches
     data_loader=dl.DataLoader
     ## Load batches of test data
-    logging.info("Loading the dataset ...")
-    test_data=args.data_dir+'processed_test_jets.pkl'
-    with open(test_data, 'rb') as f:
+    logging.info('Loading the dataset {}'.format(input_file))
+    with open(input_file, 'rb') as f:
         test_data = pickle.load(f)
-
-    logging.info("- done.")
-
     # Architecture. Define the model and optimizer
-    ## a) Simple RecNN
     if architecture=='simpleRecNN':
-        model = net.PredictFromParticleEmbedding(params,make_embedding=net.GRNNTransformSimple).cuda() if params.cuda else net.PredictFromParticleEmbedding(params,make_embedding=net.GRNNTransformSimple)
+        model = net.PredictFromParticleEmbedding(
+            params,
+            make_embedding=net.GRNNTransformSimple
+        )
     elif architecture=='gatedRecNN':
-        model = net.PredictFromParticleEmbeddingGated(params,make_embedding=net.GRNNTransformGated).cuda() if params.cuda else net.PredictFromParticleEmbeddingGated(params,make_embedding=net.GRNNTransformGated)
+        model = net.PredictFromParticleEmbeddingGated(
+            params,
+            make_embedding=net.GRNNTransformGated
+        )
     elif architecture=='leaves_inner_RecNN':
-        model = net.PredictFromParticleEmbeddingLeaves(params,make_embedding=net.GRNNTransformLeaves).cuda() if params.cuda else net.PredictFromParticleEmbeddingLeaves(params,make_embedding=net.GRNNTransformLeaves)
+        model = net.PredictFromParticleEmbeddingLeaves(
+            params,
+            make_embedding=net.GRNNTransformLeaves
+        )
     elif architecture=='NiNRecNN':
-        model = net.PredictFromParticleEmbeddingNiN(params,make_embedding=net.GRNNTransformSimpleNiN).cuda() if params.cuda else net.PredictFromParticleEmbeddingNiN(params,make_embedding=net.GRNNTransformSimpleNiN)
+        model = net.PredictFromParticleEmbeddingNiN(
+            params,
+            make_embedding=net.GRNNTransformSimpleNiN
+        )
     elif architecture=='NiNRecNN2L3W':
-        model = net.PredictFromParticleEmbeddingNiN2L3W(params,make_embedding=net.GRNNTransformSimpleNiN2L3W).cuda() if params.cuda else net.PredictFromParticleEmbeddingNiN2L3W(params,make_embedding=net.GRNNTransformSimpleNiN2L3W)
+        model = net.PredictFromParticleEmbeddingNiN2L3W(
+            params,
+            make_embedding=net.GRNNTransformSimpleNiN2L3W
+        )
     elif architecture=='NiNgatedRecNN':
-        model = net.PredictFromParticleEmbeddingGatedNiN(params,make_embedding=net.GRNNTransformGatedNiN).cuda() if params.cuda else net.PredictFromParticleEmbeddingGatedNiN(params,make_embedding=net.GRNNTransformGatedNiN)
+        model = net.PredictFromParticleEmbeddingGatedNiN(
+            params,
+            make_embedding=net.GRNNTransformGatedNiN
+        )
     elif architecture=='NiNRecNNReLU':
-        model = net.PredictFromParticleEmbeddingNiNReLU(params,make_embedding=net.GRNNTransformSimpleNiNReLU).cuda() if params.cuda else net.PredictFromParticleEmbeddingNiNReLU(params,make_embedding=net.GRNNTransformSimpleNiNReLU)
+        model = net.PredictFromParticleEmbeddingNiNReLU(
+            params,
+            make_embedding=net.GRNNTransformSimpleNiNReLU
+        )
+    else:
+        raise ValueError('unknown architecture {}'.format(architecture))
+    if params.cuda:
+        model = model.cuda()
     # Loss function
     loss_fn = torch.nn.BCELoss()
     metrics = net.metrics
-
+    #
+    # EVALUATE
+    #
     logging.info("Starting evaluation")
-
     # Reload weights from the saved file
-    utils.load_checkpoint(os.path.join(output_dir, restore_file + '.pth.tar'), model)
-
-    # EVALUATE THE MODEL
-
-    test_data=list(test_data)
-    num_steps_test=len(test_data)//params.batch_size
-
-    print('num_steps_test=',num_steps_test)
-
+    utils.load_checkpoint(restore_file, model)
+    test_data = list(test_data)
+    num_steps_test = len(test_data)//params.batch_size
+    logging.info('num_steps_test={}'.format(num_steps_test))
     # We get an integer number of batches
-    test_x=np.asarray([x for (x,y) in test_data][0:num_steps_test*params.batch_size])
-    test_y=np.asarray([y for (x,y) in test_data][0:num_steps_test*params.batch_size])
-
+    test_x = np.asarray([x for (x,y) in test_data][0:num_steps_test*params.batch_size])
+    test_y = np.asarray([y for (x,y) in test_data][0:num_steps_test*params.batch_size])
     # Create tain and val datasets. Customized dataset class dataset.TreeDataset
     # that will create the batches by calling data_loader.batch_nyu_pad.
-    test_data = dataset.TreeDataset(data=test_x,labels=test_y,transform=data_loader.batch_nyu_pad,batch_size=params.batch_size,features=params.features,shuffle=False)
-
+    test_data = dataset.TreeDataset(
+        data=test_x,
+        labels=test_y,
+        transform=data_loader.batch_nyu_pad,
+        batch_size=params.batch_size,
+        features=params.features,
+        shuffle=False
+    )
     # Create the dataloader for the train and val sets (default Pytorch dataloader). Paralelize the batch generation with num_workers. BATCH SIZE SHOULD ALWAYS BE = 1 (batches are only loaded here as a single element, and they are created with dataset.TreeDataset).
-    test_loader = torch.utils.data.DataLoader(test_data, batch_size=1, shuffle=False,
-                                               num_workers=8, pin_memory=True, collate_fn=dataset.customized_collate)
-
-
-   # Evaluate the model
-   test_metrics = evaluate(model, loss_fn, test_loader, metrics, params, num_steps_test)
-   save_path = os.path.join(output_dir, "metrics_test_{}.json".format(args.restore_file))
-   utils.save_dict_to_json(test_metrics, save_path)
+    test_loader = torch.utils.data.DataLoader(
+        test_data,
+        batch_size=1,
+        shuffle=False,
+        num_workers=8,
+        pin_memory=True,
+        collate_fn=dataset.customized_collate
+    )
+    # Evaluate the model
+    test_metrics = evaluate(
+        model=model,
+        loss_fn=loss_fn,
+        data_iterator=test_loader,
+        metrics=metrics,
+        params=params,
+        output_file=output_file,
+        num_steps=num_steps_test
+    )
+    utils.save_dict_to_json(test_metrics, output_file)
