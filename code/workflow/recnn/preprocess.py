@@ -23,15 +23,15 @@ from recnn.model import preprocess
 
 # -- Main preprocessing function -----------------------------------------------
 
-def run(params, input_tree_file, transformer_file, output_file):
+def run(tree_file, transformer_file, output_file):
     # Start pre-processing job. Main code block with the methods to load the
     # raw data, create and preprocess the trees.
     logging.info('Preprocessing jet trees ...')
     start_time = time.time()
     # Load pre-processed top tagger reference test tree data
     data_loader = dl.DataLoader
-    logging.info('Loading toptag_reference_dataset {}'.format(input_tree_file))
-    with open(input_tree_file, 'rb') as f:
+    logging.info('Loading toptag_reference_dataset {}'.format(tree_file))
+    with open(tree_file, 'rb') as f:
         tt_ref_test_data = pickle.load(f,encoding='latin-1')
     # Preprocess
     tt_ref_x = list()
