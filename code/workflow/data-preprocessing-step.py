@@ -20,33 +20,58 @@ import sys
 
 import dataset.preprocess as pf
 import recnn.preprocess as recnn
+import recnn.utils as utils
 
 
 # -- Main Function -------------------------------------------------------------
 
-# Create the input trees.
-# Load and recluster the jet constituents. Create binary trees with the clustering history of the jets and output a dictionary for each jet that contains the root_id, tree, content (constituents 4-momentum vectors), mass, pT, energy, eta and phi values (also charge, muon ID, etc depending on the information contained in the dataset)
-# FastJet needs python2.7
 if __name__ == '__main__':
-    data_dir = sys.argv[1]
-    out_dir = sys.argv[2]
-    # Ensure that the output directory for preprocessing results exists
+    """Create the input trees. Load and recluster the jet constituents. Create
+    binary trees with the clustering history of the jets and output a dictionary
+    for each jet that contains the root_id, tree, content (constituents
+    4-momentum vectors), mass, pT, energy, eta and phi values (also charge,
+    muon ID, etc depending on the information contained in the dataset).
+
+    The preprocessing step expects five command line parameters:
+    - test_jets.pkl file
+    - card file
+    - transformer.pkl
+    - template config file
+    - output file
+
+    """
+    # Get the five command line parameters that define the input and output
+    # files for the pre-processing step.
+    args = sys.argv[1:]
+    if len(args) != 5:
+        msg = 'Usage: {} <test-jets> <card-file> <transformer> <params> <out-dir>'
+        print(msg.format(sys.argv[0]))
+        sys.exit(-1)
+    input_jets_file = args[0]
+    card_file = args[1]
+    transformer_file = args[2]
+    params_file = args[3]
+    out_dir = args[4]
+    # Ensure that the output directory for preprocessing output file exists
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
-    # Expected sub-folders in the given data directory
-    jets_dir = os.path.join(data_dir, 'jets')
-    conf_dir = os.path.join(data_dir, 'config')
     # Initialize the logger
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     logging.getLogger().setLevel(logging.DEBUG)
     # Run jets preprocessing task that uses FastJet to create the tree test
     # jets.
+    raw_tree_file = os.path.join(out_dir, 'tree_test_jets.pkl')
     pf.run(
-        card_file=os.path.join(jets_dir, 'jet_image_trim_pt800-900_card.dat'),
-        sample_type='test',
-        dir_subjets=jets_dir,
-        out_file=os.path.join(out_dir, 'tree_test_jets.pkl')
+        card_file=card_file,
+        input_jets_file=input_jets_file,
+        out_file=raw_tree_file
     )
     # Apply preprocessing: get the initial 7 features: p, eta, phi, E, E/JetE,
     # pT, theta. Apply RobustScaler
-    recnn.run(config_dir=conf_dir, static_data_dir=jets_dir, run_dir=out_dir)
+    params = utils.Params(params_file)
+    recnn.run(
+        params=utils.Params(params_file),
+        input_tree_file=raw_tree_file,
+        transformer_file=transformer_file,
+        output_file=os.path.join(out_dir, 'processed_test_jets.pkl')
+    )

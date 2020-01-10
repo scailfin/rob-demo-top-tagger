@@ -210,7 +210,7 @@ def traverse_tree_rec(
 
 # -- Main preprocessing function (from toptag_reference_dataset_Tree.py) -------
 
-def run(card_file, sample_type, dir_subjets, out_file):
+def run(card_file, input_jets_file, out_file):
     """Load and recluster the jet constituents. Create binary trees with the
     clustering history of the jets and output a dictionary for each jet that
     contains the root_id, tree, content (constituents 4-momentum vectors),
@@ -271,46 +271,29 @@ def run(card_file, sample_type, dir_subjets, out_file):
     #    [[etasubj1],[etasubj2],...],
     #    [[phisubj1],[phisubj2],...]]
     # ])
-    subjetlist = list()
-    for filename in np.sort(os.listdir(dir_subjets)):
-        if sample_type in filename and filename.endswith('.pkl'):
-            subjetlist.append(filename)
-    # ???
-    N_analysis=len(subjetlist)
-    logging.info('Number of subjet files =',N_analysis)
-    logging.info('Loading subjet files...  \n {}'.format(subjetlist))
+    logging.info('Loading subjet file {}'.format(input_jets_file))
     # ???
     images=[]
     jetmasslist=[]
-    Ntotjets=0
     counter=0
     ## Loop over the data
-    jet_mass_difference=[]
-    for ifile in range(N_analysis):
-        if Ntotjets > N_jets:
-            break
-        file = os.path.join(dir_subjets, subjetlist[ifile])
-        with open(file, 'rb') as f:
-            jets_file = pickle.load(f)
-        jet_pT=[]
-        jet_mass=[]
-        reclustered_jets=[]
-        # Loop over all the events
-        for element in jets_file:
-            event=make_pseudojet(element[0])
-            label=element[1]
-            # Recluster jet constituents
-            out_jet = recluster(event, 0.8,'kt')
-            # Create a dictionary with all the jet tree info (topology,
-            # constituents features: eta, phi, pT, E, muon label)
-            jets_tree = make_tree_list(out_jet)
-            # Keep only the leading jet
-            for tree, content, mass, pt in [jets_tree[0]]:
-                jet_pT.append(pt)
-                jet_mass.append(mass)
-                jet = make_dictionary(tree,content,mass,pt)
-                reclustered_jets.append((jet, label))
-                counter+=1
+    with open(input_jets_file, 'rb') as f:
+        jets_file_content = pickle.load(f)
+    reclustered_jets = list()
+    # Loop over all the events
+    for element in jets_file_content:
+        event = make_pseudojet(element[0])
+        label = element[1]
+        # Recluster jet constituents
+        out_jet = recluster(event, 0.8,'kt')
+        # Create a dictionary with all the jet tree info (topology,
+        # constituents features: eta, phi, pT, E, muon label)
+        jets_tree = make_tree_list(out_jet)
+        # Keep only the leading jet
+        for tree, content, mass, pt in [jets_tree[0]]:
+            jet = make_dictionary(tree, content, mass, pt)
+            reclustered_jets.append((jet, label))
+            counter += 1
     # Save output to file
     logging.info('out_filename={}'.format(out_file))
     with open(out_file, "wb") as f:
