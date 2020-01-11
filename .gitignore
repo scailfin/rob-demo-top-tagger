@@ -74,5 +74,4 @@ target/
 .tmp/
 
 # Benchmark run outputs
-outputs/
-benchmark/results/
+results/
