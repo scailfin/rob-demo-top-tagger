@@ -14,7 +14,7 @@ workflow:
           - environment: $[[envML]]
             commands:
               - $[[cmdML]]
-          - environment: 'python:3.7'
+          - environment: 'toptagger:1.0'
             commands:
               - 'python code/save-probabilities.py data/evaluate/ results/'
     outputs:
@@ -28,7 +28,7 @@ parameters:
     - id: 'envPreProc'
       name: 'Environment (Pre-Processing)'
       datatype: 'string'
-      defaultValue: 'python:3.7'
+      defaultValue: 'toptagger:1.0'
       index: 0
     - id: 'cmdPreProc'
       name: 'Command  (Pre-Processing)'
@@ -42,7 +42,7 @@ parameters:
     - id: 'envML'
       name: 'Environment (ML)'
       datatype: 'string'
-      defaultValue: 'python:3.7'
+      defaultValue: 'toptagger:1.0'
       index: 2
     - id: 'cmdML'
       name: 'Command (ML)'

@@ -10,4 +10,6 @@ RUN ./configure --enable-pyext --prefix=$PWD/../fastjet-install
 RUN make
 RUN make check
 RUN make install
+ENV LD_LIBRARY_PATH=/opt/fastjet-install/lib
+ENV PYTHONPATH=/opt/fastjet-install/lib/python3.7/site-packages
 WORKDIR /

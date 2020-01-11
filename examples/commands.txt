@@ -1,12 +1,13 @@
 robadm benchmarks create \
-    -n "Jets Top Tagger" \
+    -n "Top Tagger Benchmark" \
     -d "Machine Learning Landscape of Top Taggers" \
-    -i instructions.txt -s benchmark/
+    -i benchmark/instructions.txt \
+    -s benchmark/
 
 export ROB_BENCHMARK=xxx
 
 rob submissions create \
-    -n "Go Bob" \
+    -n "Go Alice" \
     -p ./examples/algorithms.yaml
 
 export ROB_SUBMISSION=xxx

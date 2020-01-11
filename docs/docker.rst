@@ -17,8 +17,6 @@ Run workflow steps:
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/benchmark/code:/code \
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/benchmark/data:/data \
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/results:/results \
-        --env LD_LIBRARY_PATH=/opt/fastjet-install/lib \
-        --env PYTHONPATH=/opt/fastjet-install/lib/python3.7/site-packages \
         toptagger:1.0 \
         python code/preprocess-dataset.py \
             data/test_jets.pkl \
