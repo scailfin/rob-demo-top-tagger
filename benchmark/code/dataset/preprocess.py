@@ -219,7 +219,7 @@ def run(card_file, input_jets_file, out_file):
     """
     # Read card file and extract command list from file content
     with open(card_file) as f:
-       commands=f.readlines()
+        commands = f.readlines()
     commands = [x.strip().split('#')[0].split() for x in commands]
     # Evaluate commands in the extracted list
     ptmin = -9999999.
@@ -227,7 +227,7 @@ def run(card_file, input_jets_file, out_file):
     maxeta = 9999999.
     matchdeltaR = 9999999.
     mergedeltaR = 9999999.
-    N_jets=np.inf
+    N_jets = np.inf
     for command in commands:
         if len(command)>=2:
             if command[0] == 'TRIMMING':
@@ -273,10 +273,8 @@ def run(card_file, input_jets_file, out_file):
     # ])
     logging.info('Loading subjet file {}'.format(input_jets_file))
     # ???
-    images=[]
-    jetmasslist=[]
-    counter=0
-    ## Loop over the data
+    counter = 0
+    # Loop over the data
     with open(input_jets_file, 'rb') as f:
         jets_file_content = pickle.load(f)
     reclustered_jets = list()
@@ -285,7 +283,7 @@ def run(card_file, input_jets_file, out_file):
         event = make_pseudojet(element[0])
         label = element[1]
         # Recluster jet constituents
-        out_jet = recluster(event, 0.8,'kt')
+        out_jet = recluster(event, 0.8, 'kt')
         # Create a dictionary with all the jet tree info (topology,
         # constituents features: eta, phi, pT, E, muon label)
         jets_tree = make_tree_list(out_jet)
