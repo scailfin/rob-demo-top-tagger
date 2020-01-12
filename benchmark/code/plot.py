@@ -29,6 +29,23 @@ def get_accuracy(outputs, labels):
     return np.sum(outputs == labels) / float(len(labels))
 
 
+def get_median_model(true_labels, tagger_outputs):
+    """Get median model sorted by auc."""
+    taggers_median = dict()
+    for t_name in tagger_outputs:
+        out_probs = tagger_outputs[t_name]
+        aucs_tuple = []
+        for i in range(len(out_probs)):
+            auc = roc_auc_score(true_labels, out_probs[i])
+            aucs_tuple.append((i, auc))
+        sorted_auc = sorted(aucs_tuple, key=lambda x: x[1])
+        median_model = sorted_auc[len(sorted_auc)//2]
+        print('Median model (position,auc) = {}'.format(median_model))
+        # Choose median model
+        taggers_median[t_name] = out_probs[median_model[0]]
+    return taggers_median
+
+
 def plot(tagger_results, input_truth_file, tag_eff, output_file):
     """Create plot containing ROC corves for all tagger outputs. Saves the plot
     to the given output file.
@@ -57,7 +74,8 @@ def plot(tagger_results, input_truth_file, tag_eff, output_file):
         t_name = tagger['name']
         tagger_names.append(t_name)
         with open(tagger['file'], 'rb') as f:
-            tagger_outputs[t_name] = np.load(f)
+            tagger_outputs[t_name] = np.asarray(pickle.load(f))
+    tagger_median = get_median_model(true_labels, tagger_outputs)
     # Shortcut to tagger names and outputs
     # ???
     aucs = []
@@ -75,7 +93,7 @@ def plot(tagger_results, input_truth_file, tag_eff, output_file):
     linestyles = ['-', '--', '-.', ':'] * 10
     for t_name in tagger_names:
         # Tagger output array
-        t_out = tagger_outputs[t_name]
+        t_out = tagger_median[t_name]
         # Tagger accuracies, AUC, and ROC curve
         accuracies.append(get_accuracy(t_out, true_labels))
         aucs.append(roc_auc_score(true_labels, t_out))
@@ -101,7 +119,16 @@ def plot(tagger_results, input_truth_file, tag_eff, output_file):
             label=str(t_name),
             linestyle=linestyles.pop(0)
         )
+        plt.xticks(np.linspace(0, 1, 11))
+        plt.xlabel(r"Signal efficiency $\epsilon_S$", fontsize=15)
+        plt.ylabel(r"Background rejection $\frac{1}{\epsilon_B}$", fontsize=15)
+        plt.xlim([-0.01, 1.02])
+        plt.ylim(4, 40000)
+        plt.yscale("log")
+        plt.legend(loc="best")
+        plt.grid(which='both', axis='both', linestyle='--')
         plt.savefig(output_file)
+        plt.show()
 
 
 if __name__ == '__main__':
