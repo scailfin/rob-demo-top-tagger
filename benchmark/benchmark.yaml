@@ -1,19 +1,19 @@
 workflow:
-    version: 0.3.0
+    version: '0.3.0'
     inputs:
       files:
-        - code/
-        - data/
+        - 'code/'
+        - 'data/'
     workflow:
-      type: serial
+      type: 'serial'
       specification:
         steps:
-          - environment: $[[envPreProc]]
+          - environment: '$[[envPreProc]]'
             commands:
-              - $[[cmdPreProc]]
-          - environment: $[[envML]]
+              - '$[[cmdPreProc]]'
+          - environment: '$[[envML]]'
             commands:
-              - $[[cmdML]]
+              - '$[[cmdML]]'
           - environment: 'toptagger:1.0'
             commands:
               - 'python code/save-probabilities.py data/evaluate/ results/'
@@ -24,6 +24,21 @@ workflow:
        - 'results/analyze.log'
        - 'results/evaluate.log'
        - 'results/preproc.log'
+postProcessing:
+    steps:
+        - environment: 'toptagger:1.0'
+          mount:
+            - 'code/'
+            - 'evaluate/'
+          inputs:
+              - 'results/yProbBest.pkl'
+          commands:
+              - 'python code/plot.py ${results} evaluate/labels.pkl ${output-dir}'
+          outputs:
+          - id: 'roc'
+            title: 'ROC Curves'
+            type: 'image/png'
+            file: 'ROC.png'
 parameters:
     - id: 'envPreProc'
       name: 'Environment (Pre-Processing)'
@@ -55,20 +70,20 @@ parameters:
 results:
     file: 'results/results.json'
     schema:
-        - id: mean_accuracy
+        - id: 'mean_accuracy'
           name: 'Accuracy (mean)'
           path: 'accuracy/mean'
-          type: decimal
-        - id: mean_auc
+          type: 'decimal'
+        - id: 'mean_auc'
           name: 'AUC (mean)'
           path: 'auc/mean'
-          type: decimal
-        - id: mean_loss
+          type: 'decimal'
+        - id: 'mean_loss'
           name: 'Loss (mean)'
           path: 'loss/mean'
-          type: decimal
+          type: 'decimal'
     orderBy:
-        - id: mean_accuracy
+        - id: 'mean_accuracy'
           sortDesc: true
-        - id: mean_auc
+        - id: 'mean_auc'
           sortDesc: true
