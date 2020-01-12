@@ -31,14 +31,14 @@ def get_accuracy(outputs, labels):
 
 def plot(tagger_results, input_truth_file, tag_eff, output_file):
     """Create plot containing ROC corves for all tagger outputs. Saves the plot
-    to the given outout file.
+    to the given output file.
 
     Parameters
     ----------
     tagger_results: list(dict)
-        List of tagger result file information. Each element in the list is a
-        dictionary with two elements: the unique tagger name ('name') and the
-        path to the tagger result file ('file')
+        List containing information about the results for each tagger. Each
+        item in the list is a dictionary with two elements: the unique tagger
+        name ('name') and the path to the tagger result file ('file')
     input_truth_file: string
          Path to the file (labels.pkl) that contains the ground truth data
     tag_eff: float
