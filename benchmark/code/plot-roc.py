@@ -6,6 +6,7 @@
 # ROB is free software; you can redistribute it and/or modify it under the
 # terms of the MIT License; see LICENSE file for more details.
 
+import json
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -34,7 +35,7 @@ def get_median_model(true_labels, tagger_outputs):
     return taggers_median
 
 
-def plot(tagger_results, input_truth_file, output_file, show_plot=False):
+def plot(tagger_results, input_truth_file, start_index, output_file, show_plot=False):
     """Create plot containing ROC corves for all tagger outputs. Saves the plot
     to the given output file.
 
@@ -45,15 +46,19 @@ def plot(tagger_results, input_truth_file, output_file, show_plot=False):
         item in the list is a dictionary with two elements: the unique tagger
         name ('name') and the path to the tagger result file ('file')
     input_truth_file: string
-         Path to the file (labels.pkl) that contains the ground truth data
+        Path to the file (labels.pkl) that contains the ground truth data
+    start_index: int
+        Start index for jet processing.
     output_file: string
         Path to the output file where the plot is stored
     show_plot: boolean, optional
         Show the created plot after saving it
     """
-    # Load groundtruth labels
+    # Load groundtruth labels. Keep only the labels that come after the start
+    # index
     with open(input_truth_file, 'rb') as f:
         true_labels = np.asarray(pickle.load(f), dtype=int)
+    true_labels = true_labels[start_index:]
     # Load tagger result data. Maintain list of tagger names in order of their
     # appearance in the result list and a dictionary that maps tagger names to
     # their output data.
@@ -63,7 +68,7 @@ def plot(tagger_results, input_truth_file, output_file, show_plot=False):
         t_name = tagger['name']
         tagger_names.append(t_name)
         with open(tagger['file'], 'rb') as f:
-            tagger_outputs[t_name] = np.load(f)
+            tagger_outputs[t_name] = np.asarray(pickle.load(f))
     tagger_median = get_median_model(true_labels, tagger_outputs)
     # Shortcut to tagger names and outputs
     base_tpr = np.linspace(0.05, 1, 476)
@@ -109,13 +114,24 @@ if __name__ == '__main__':
     args = sys.argv[1:]
     if len(args) != 3:
         prog = os.path.basename(sys.argv[0])
-        args = ['<tagger-result-file>', '<groundtruth-file>', '<output-file>']
+        args = ['<in_dir>', '<groundtruth-file>', '<output-dir>']
         print('Usage: {} {}'.format(prog, ' '.join(args)))
         sys.exit(-1)
-    results = list([{'name': 'TreeNiN', 'file': args[0]}])
+    in_dir = args[0]
+    input_truth_file = args[1]
+    out_dir = args[2]
+    # Read the submission information
+    with open(os.path.join(args[0], 'submissions.json'), 'r') as f:
+        submissions = json.load(f)
+    results = list()
+    for s in submissions:
+        filename = os.path.join(in_dir, s['id'], 'results/yProbBest.pkl')
+        results.append({'name': s['name'], 'file': filename})
+    # [{'name': 'TreeNiN', 'file': args[0]}]
     plot(
         tagger_results=results,
-        input_truth_file=args[1],
-        output_file=args[2],
-        show_plot=True
+        input_truth_file=input_truth_file,
+        start_index=400000,
+        output_file=os.path.join(out_dir, 'ROC.png'),
+        show_plot=False
     )

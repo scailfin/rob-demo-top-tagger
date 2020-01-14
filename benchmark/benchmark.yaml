@@ -8,12 +8,12 @@ workflow:
       type: 'serial'
       specification:
         steps:
-          - environment: '$[[envPreProc]]'
+          - environment: '$[[env_preproc]]'
             commands:
-              - '$[[cmdPreProc]]'
-          - environment: '$[[envML]]'
+              - '$[[cmd_preproc]]'
+          - environment: '$[[env_eval]]'
             commands:
-              - '$[[cmdML]]'
+              - '$[[cmd_eval]]'
           - environment: 'toptagger:1.0'
             commands:
               - 'python code/save-probabilities.py data/evaluate/ results/'
@@ -24,28 +24,34 @@ workflow:
        - 'results/analyze.log'
        - 'results/evaluate.log'
        - 'results/preproc.log'
-postProcessing:
-    steps:
-        - environment: 'toptagger:1.0'
-          mount:
-            - 'code/'
-            - 'evaluate/'
-          inputs:
-              - 'results/yProbBest.pkl'
-          commands:
-              - 'python code/plot.py ${results} evaluate/labels.pkl ${output-dir}'
-          outputs:
-          - id: 'roc'
-            title: 'ROC Curves'
-            type: 'image/png'
-            file: 'ROC.png'
+postproc:
+    environment: 'toptagger:1.0'
+    mount:
+        - 'code/'
+        - 'evaluate/'
+    inputs:
+        - 'results/yProbBest.pkl'
+    commands:
+        - 'python code/plot-roc.py $in evaluate/labels.pkl $out'
+    outputs:
+        - id: 'ROC.png'
+          name: 'ROC Curves'
+          type: 'image/png'
+modules:
+    - id: 'preproc'
+      name: 'Pre-Processing Step'
+      index: 0
+    - id: 'eval'
+      name: 'ML Evaluation Step'
+      index: 1
 parameters:
-    - id: 'envPreProc'
+    - id: 'env_preproc'
       name: 'Environment (Pre-Processing)'
       datatype: 'string'
       defaultValue: 'toptagger:1.0'
       index: 0
-    - id: 'cmdPreProc'
+      module: 'preproc'
+    - id: 'cmd_preproc'
       name: 'Command  (Pre-Processing)'
       datatype: 'string'
       defaultValue: 'python code/preprocess-dataset.py
@@ -54,12 +60,14 @@ parameters:
         data/preprocess/transformer.pkl
         results/'
       index: 1
-    - id: 'envML'
+      module: 'preproc'
+    - id: 'env_eval'
       name: 'Environment (ML)'
       datatype: 'string'
       defaultValue: 'toptagger:1.0'
       index: 2
-    - id: 'cmdML'
+      module: 'eval'
+    - id: 'cmd_eval'
       name: 'Command (ML)'
       datatype: 'string'
       defaultValue: 'python code/evaluate-models.py
@@ -67,6 +75,7 @@ parameters:
         data/evaluate/
         results'
       index: 3
+      module: 'eval'
 results:
     file: 'results/results.json'
     schema:

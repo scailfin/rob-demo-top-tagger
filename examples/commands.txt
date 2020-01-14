@@ -11,3 +11,20 @@ rob submissions create \
     -p ./examples/algorithms.yaml
 
 export ROB_SUBMISSION=xxx
+
+
+
+export ROB_API_DIR=/home/heiko/projects/scailfin/.toptagger
+
+robadm init -f
+robadm benchmarks create \
+    -n "Top Tagger Benchmark" \
+    -d "Machine Learning Landscape of Top Taggers" \
+    -i benchmark/instructions.txt \
+    -s benchmark/
+flask run
+
+rob register -u alice -p mypwd
+eval $(rob login -u alice -p mypwd)
+eval $(rob submissions create -n "Go Alice")
+rob runs start
