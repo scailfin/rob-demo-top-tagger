@@ -28,14 +28,15 @@ postproc:
     environment: 'toptagger:1.0'
     mount:
         - 'code/'
-        - 'evaluate/'
+        - 'data/'
     inputs:
         - 'results/yProbBest.pkl'
     commands:
-        - 'python code/plot-roc.py $in evaluate/labels.pkl $out'
+        - 'python code/plot-roc.py ${in} data/evaluate/labels.pkl ${out}'
     outputs:
         - id: 'ROC.png'
-          name: 'ROC Curves'
+          name: 'ROC Curves for all Algorithms'
+          caption: 'ROC curves for all algorithms evaluated on the test sample, shown as the AUC ensemble median of  multiple  trainings. '
           type: 'image/png'
 modules:
     - id: 'preproc'
@@ -80,15 +81,16 @@ results:
     file: 'results/results.json'
     schema:
         - id: 'bg_reject_outliers'
+          name: 'Background rejection (at 50%)'
           type: 'decimal'
         - id: 'bg_reject_std_outliers'
+          name: 'Background rejection (STD)'
           type: 'decimal'
         - id: 'aucs_outliers'
-          type: 'decimal'
-        - id: 'auc_std_outliers'
+          name: 'AUC'
           type: 'decimal'
     orderBy:
         - id: 'bg_reject_outliers'
           sortDesc: true
         - id: 'bg_reject_std_outliers'
-          sortDesc: true
+          sortDesc: false
