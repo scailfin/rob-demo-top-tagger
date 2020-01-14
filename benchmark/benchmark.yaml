@@ -79,20 +79,16 @@ parameters:
 results:
     file: 'results/results.json'
     schema:
-        - id: 'mean_accuracy'
-          name: 'Accuracy (mean)'
-          path: 'accuracy/mean'
+        - id: 'bg_reject_outliers'
           type: 'decimal'
-        - id: 'mean_auc'
-          name: 'AUC (mean)'
-          path: 'auc/mean'
+        - id: 'bg_reject_std_outliers'
           type: 'decimal'
-        - id: 'mean_loss'
-          name: 'Loss (mean)'
-          path: 'loss/mean'
+        - id: 'aucs_outliers'
+          type: 'decimal'
+        - id: 'auc_std_outliers'
           type: 'decimal'
     orderBy:
-        - id: 'mean_accuracy'
+        - id: 'bg_reject_outliers'
           sortDesc: true
-        - id: 'mean_auc'
+        - id: 'bg_reject_std_outliers'
           sortDesc: true

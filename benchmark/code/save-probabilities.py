@@ -13,23 +13,23 @@ import logging
 import numpy as np
 import os
 import pickle
-import scipy as sp
 import statistics
 import sys
 
 import files as fn
+import recnn.analyze as analyze
 import recnn.utils as utils
 
 
-# -- Helper Functions ----------------------------------------------------------
+# -- Helper Functions ---------------------------------------------------------
 
 def load_results(data_dir, result_dir, verbose=False):
     """Load all the info for each run in a dictionary (hyperparameteres, auc,
     fpr, tpr, output prob, etc).
     """
-    # For each folder in the result directory that starts with the prefix 'run_'
-    # and contains a metrics resutl file we read the results as well as the
-    # parameters from the respective folder in the data directory.
+    # For each folder in the result directory that starts with the prefix
+    # 'run_' and contains a metrics resutl file we read the results as well as
+    # the parameters from the respective folder in the data directory.
     results = list()
     for subdir in os.listdir(result_dir):
         if subdir.startswith(fn.RUN_DIR_PREFIX):
@@ -66,12 +66,12 @@ def load_results(data_dir, result_dir, verbose=False):
     return results
 
 
-# -- Main Function -------------------------------------------------------------
+# -- Main Function ------------------------------------------------------------
 
 if __name__ == '__main__':
-    # Get command line arguments. Expects a reference to the data base directory
-    # that contains the run parameters as well as the output directory that
-    # contains the run results.
+    # Get command line arguments. Expects a reference to the data base
+    # directory that contains the run parameters as well as the output
+    # directory that contains the run results.
     args = sys.argv[1:]
     if len(args) != 2:
         print('Usage: {} <data-dir> <result_dir>'.format(sys.argv[0]))
@@ -89,44 +89,26 @@ if __name__ == '__main__':
     y_prob_best = np.asarray([element['yProbTrue'] for element in results])
     # Saving output probabilities and true values
     output_file = os.path.join(results_dir, fn.Y_PROB_BEST_FILE)
-    logging.info('Saving output probabilities and true values to {}'.format(output_file))
+    msg = 'Saving output probabilities and true values to {}'
+    logging.info(msg.format(output_file))
     with open(output_file, 'wb') as f:
-        pickle.dump(y_prob_best[:,:,0], f)
-    # Create Json file containing an array of accuracy, loss, and auc values
-    # for each run
-    accuracy = list()
-    loss = list()
-    auc = list()
-    values = list()
-    for r in results:
-        values.append({
-            'accuracy': r['accuracy'],
-            'loss': r['loss'],
-            'auc': r['auc']
-        })
-        accuracy.append(r['accuracy'])
-        loss.append(r['loss'])
-        auc.append(r['auc'])
+        pickle.dump(y_prob_best[:, :, 0], f)
+    # Load groundtruth labels. Keep only the labels that come after the start
+    # index
+    with open(os.path.join(data_dir, 'labels.pkl'), 'rb') as f:
+        true_labels = np.asarray(pickle.load(f), dtype=int)
+    true_labels = true_labels[400000:]
+    (
+        bg_reject_outliers,
+        bg_reject_std_outliers,
+        aucs_outliers,
+        auc_std_outliers
+    ) = analyze.get_median_bg_reject(y_prob_best[:, :, 0], true_labels)
     doc = {
-        'accuracy': {
-            'min': min(accuracy),
-            'max': max(accuracy),
-            'mean': statistics.mean(accuracy),
-            'stdev': statistics.stdev(accuracy)
-        },
-        'loss': {
-            'min': min(loss),
-            'max': max(loss),
-            'mean': statistics.mean(loss),
-            'stdev': statistics.stdev(loss)
-        },
-        'auc': {
-            'min': min(auc),
-            'max': max(auc),
-            'mean': statistics.mean(auc),
-            'stdev': statistics.stdev(auc)
-        },
-        'results': values
+        'bg_reject_outliers': bg_reject_outliers[0],
+        'bg_reject_std_outliers': bg_reject_std_outliers[0],
+        'aucs_outliers': aucs_outliers[0],
+        'auc_std_outliers': auc_std_outliers[0]
     }
     output_file = os.path.join(results_dir, fn.RESULT_FILE)
     logging.info('Saving result summary to {}'.format(output_file))

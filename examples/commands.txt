@@ -28,3 +28,13 @@ rob register -u alice -p mypwd
 eval $(rob login -u alice -p mypwd)
 eval $(rob submissions create -n "Go Alice")
 rob runs start
+
+
+eval $(rob submissions create -n "Go Alice")
+python code/evaluate-models-0-3.py results/processed_test_jets.pkl data/evaluate/ results
+
+eval $(rob submissions create -n "Go Bob")
+python code/evaluate-models-3-6.py results/processed_test_jets.pkl data/evaluate/ results
+
+eval $(rob submissions create -n "Go Claire")
+python code/evaluate-models-6-9.py results/processed_test_jets.pkl data/evaluate/ results
