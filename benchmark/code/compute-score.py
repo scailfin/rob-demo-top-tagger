@@ -13,12 +13,10 @@ import logging
 import numpy as np
 import os
 import pickle
-import statistics
 import sys
 
 import files as fn
 import recnn.analyze as analyze
-import recnn.utils as utils
 
 
 # -- Main Function ------------------------------------------------------------
@@ -44,8 +42,7 @@ if __name__ == '__main__':
     msg = 'Reading output probabilities from {}'
     logging.info(msg.format(result_file))
     with open(result_file, 'rb') as f:
-        results = pickle.load(f)
-    y_prob_best = np.asarray([element['yProbTrue'] for element in results])
+        y_prob_best = pickle.load(f)
     # Load groundtruth labels. Keep only the labels that come after the start
     # index
     with open(os.path.join(data_dir, 'labels.pkl'), 'rb') as f:
@@ -56,8 +53,7 @@ if __name__ == '__main__':
         bg_reject_std_outliers,
         aucs_outliers,
         auc_std_outliers
-    ) = analyze.get_median_bg_reject(y_prob_best[:, :, 0], true_labels)
-    print(y_prob_best[:, :, 0])
+    ) = analyze.get_median_bg_reject(y_prob_best, true_labels)
     doc = {
         'bg_reject_outliers': bg_reject_outliers[0],
         'bg_reject_std_outliers': bg_reject_std_outliers[0],

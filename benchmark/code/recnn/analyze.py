@@ -38,6 +38,7 @@ def get_median_bg_reject(
 
     bg_reject = []
     aucs = []
+    print('Tagger has {} runs'.format(len(tagger_result)))
     for i in range(len(tagger_result)):
         auc = roc_auc_score(true_labels, tagger_result[i])
         aucs.append(auc)

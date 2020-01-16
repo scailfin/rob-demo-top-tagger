@@ -30,7 +30,7 @@ import recnn.utils as utils
 
 # -- Helper Functions ---------------------------------------------------------
 
-def load_results(data_dir, result_dir, n_start, n_finish, verbose=False):
+def load_results(data_dir, result_dir, n_start, n_finish):
     """Load all the info for each run in a dictionary (hyperparameteres, auc,
     fpr, tpr, output prob, etc).
     """
@@ -43,36 +43,12 @@ def load_results(data_dir, result_dir, n_start, n_finish, verbose=False):
             run_id = int(subdir[subdir.rfind('_') + 1])
             if n_start <= run_id < n_finish:
                 run_dir = os.path.join(result_dir, subdir)
-                result_file = os.path.join(run_dir, fn.METRICS_FILE)
+                result_file = os.path.join(run_dir, fn.Y_PROB_TRUE_FILE)
                 if os.path.isfile(result_file):
-                    # If the result file exists we assume that the probabilities
-                    # file also exists as well as the run parameters file
-                    with open(result_file, 'r') as f:
-                        data = json.load(f)
-                    # Read output probabilities and true values
-                    y_prob_file  = os.path.join(run_dir, fn.Y_PROB_TRUE_FILE)
-                    with open(y_prob_file, 'rb') as f:
+                    with open(result_file, 'rb') as f:
                         y_prob_true = list(pickle.load(f))
-                    # Read run parameters
-                    params_file = os.path.join(data_dir, subdir, fn.PARAMS_FILE)
-                    params = utils.Params(params_file)
-                    dictionary = {
-                        'runName': subdir,
-                        'lr': params.learning_rate,
-                        'decay': params.decay,
-                        'batch': params.batch_size,
-                        'hidden': params.hidden,
-                        'Njets': params.myN_jets,
-                        'Nfeatures': params.features,
-                        'accuracy': data['accuracy'],
-                        'loss': data['loss'],
-                        'auc': data['auc'],
-                        'yProbTrue': list(y_prob_true)
-                    }
-                    results.append(dictionary)
-                    if verbose:
-                        logging.info(dictionary)
-    return results
+                    results.append(np.asarray(y_prob_true))
+    return np.asarray(results)
 
 
 # -- Main Function ------------------------------------------------------------
@@ -92,11 +68,12 @@ def main(args):
     for n_run in np.arange(args.n_start, args.n_finish):
         run_id = '{}{}'.format(fn.RUN_DIR_PREFIX, n_run)
         run_dir = os.path.join(args.data_dir, run_id)
+        restore_file = os.path.join(run_dir, '{}.pth.tar'.format(args.restore))
         eval.run(
             tree_file=args.tree_file,
             params=utils.Params(os.path.join(run_dir, fn.PARAMS_FILE)),
             architecture=args.algorithm,
-            restore_file=os.path.join(run_dir, '{}.pth.tar'.format(args.restore)),
+            restore_file=restore_file,
             output_dir=os.path.join(args.output_dir, run_id)
         )
     # Combine result files to generate output file
@@ -105,17 +82,14 @@ def main(args):
         data_dir=args.data_dir,
         result_dir=args.output_dir,
         n_start=args.n_start,
-        n_finish=args.n_finish,
-        verbose=False
+        n_finish=args.n_finish
     )
-    y_prob_best = np.asarray([element['yProbTrue'] for element in results])
     # Saving output probabilities and true values
     output_file = os.path.join(args.output_dir, fn.Y_PROB_BEST_FILE)
     msg = 'Saving output probabilities and true values to {}'
     logging.info(msg.format(output_file))
     with open(output_file, 'wb') as f:
-        #pickle.dump(y_prob_best[:, :, 0], f)
-        pickle.dump(results, f)
+        pickle.dump(results[:, :, 0], f)
     # Log runtime information
     exec_time = time.time()-start_time
     logging.info('Preprocessing time (minutes) = {}'.format(exec_time/60))
