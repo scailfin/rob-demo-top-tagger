@@ -8,7 +8,7 @@ The goal of this study is to see how well different neutral network setups can c
 
 The benchmark workflow consists of three main steps.
 
-![Benchmark Workflow Overview](https://github.com/scailfin/rob-demo-top-tagger/raw/master/docs/graphics/toptagger-overview.png "Top Tagger Benchmark - Workflow Overview")
+![Benchmark Workflow Overview](https://github.com/scailfin/rob-demo-top-tagger/raw/master/docs/graphics/toptagger-overview-small.png "Top Tagger Benchmark - Workflow Overview")
 
 Participants are given a test dataset consisting of 200k signal and 200k background jets. The top signal and mixed quark-gluon background jets are produced with using Pythia8 with its default tune for a center-of-mass energy of 14 TeV and ignoring multiple interactions and pile-up. For a simplified detector simulation we use Delphes with the default ATLAS detector card.
 
