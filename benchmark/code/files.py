@@ -13,7 +13,9 @@
 RAW_TREE_FILE = 'tree_test_jets.pkl'
 """Result file of the dataset preprocessing step."""
 PROCESSED_TREE_FILE = 'processed_test_jets.pkl'
-
+"""Additional pre-processing input files."""
+CARD_FILE = 'jet_image_trim_pt800-900_card.dat'
+TRANSFORMER_FILE = 'transformer.pkl'
 
 # -- Evaluate ------------------------------------------------------------------
 """Name of file containing run parameter dictionary."""

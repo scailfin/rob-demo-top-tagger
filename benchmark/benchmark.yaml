@@ -16,7 +16,7 @@ workflow:
               - '$[[cmd_eval]]'
           - environment: 'toptagger:1.0'
             commands:
-              - 'python code/save-probabilities.py data/evaluate/ results/'
+              - 'python code/compute-score.py data/evaluate/ results/'
     outputs:
       files:
        - 'results/yProbBest.pkl'
@@ -57,8 +57,7 @@ parameters:
       datatype: 'string'
       defaultValue: 'python code/preprocess-dataset.py
         data/test_jets.pkl
-        data/preprocess/jet_image_trim_pt800-900_card.dat
-        data/preprocess/transformer.pkl
+        data/preprocess/
         results/'
       index: 1
       module: 'preproc'
@@ -71,10 +70,10 @@ parameters:
     - id: 'cmd_eval'
       name: 'Command (ML)'
       datatype: 'string'
-      defaultValue: 'python code/evaluate-models.py
+      defaultValue: 'python code/your_script.py
         results/processed_test_jets.pkl
         data/evaluate/
-        results'
+        results/'
       index: 3
       module: 'eval'
 results:

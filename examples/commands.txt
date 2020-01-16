@@ -24,6 +24,8 @@ robadm benchmarks create \
     -s benchmark/
 flask run
 
+flask run -h cds-swg1.cims.nyu.edu
+
 rob register -u alice -p mypwd
 eval $(rob login -u alice -p mypwd)
 eval $(rob submissions create -n "Go Alice")

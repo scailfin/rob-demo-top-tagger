@@ -6,24 +6,10 @@
 # ROB is free software; you can redistribute it and/or modify it under the
 # terms of the MIT License; see LICENSE file for more details.
 
-"""Default implementation for the model evaluation step in the Top Tagger
-workflow.
-
-usage: evaluate-models.py [-h] [-a ARCHITECTURE] [-r RESTORE] [-s N_START]
-                          [-f N_FINISH]
-                          tree_file data_dir output_dir
-"""
+"""Demo evaluation file for algorithm Naive."""
 
 import argparse
-import logging
-import numpy as np
-import os
-import sys
-import time
-
-import files as fn
-import recnn.evaluate as eval
-import recnn.utils as utils
+import evaluate_models as eval
 
 
 if __name__ == '__main__':
@@ -41,7 +27,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '-a', '--algorithm',
-        default='NiNRecNNReLU',
+        default='NiNRecNN2L3W',
         help='Model architecture identifier'
     )
     parser.add_argument(
@@ -58,31 +44,10 @@ if __name__ == '__main__':
     parser.add_argument(
         '-f', '--n_finish',
         type=int,
-        default=6,
+        default=9,
         help='End model number.'
     )
     parser.add_argument('tree_file', help='Preprocessed tree dataset.')
     parser.add_argument('data_dir', help='Base directory for run parameters.')
     parser.add_argument('output_dir', help='Base directory for run results.')
-    args = parser.parse_args()
-    # Initialize the logger
-    log = logging.getLogger()
-    log.addHandler(logging.StreamHandler(sys.stdout))
-    log_file = os.path.join(args.output_dir, fn.EVAL_LOG_FILE)
-    log.addHandler(logging.FileHandler(log_file))
-    logging.getLogger().setLevel(logging.DEBUG)
-    # Call evaluation function for each model
-    start_time = time.time()
-    for n_run in np.arange(args.n_start, args.n_finish):
-        run_id = '{}{}'.format(fn.RUN_DIR_PREFIX, n_run)
-        run_dir = os.path.join(args.data_dir, run_id)
-        eval.run(
-            tree_file=args.tree_file,
-            params=utils.Params(os.path.join(run_dir, fn.PARAMS_FILE)),
-            architecture=args.algorithm,
-            restore_file=os.path.join(run_dir, '{}.pth.tar'.format(args.restore)),
-            output_dir=os.path.join(args.output_dir, run_id)
-        )
-    # Log runtime information
-    exec_time = time.time()-start_time
-    logging.info('Preprocessing time (minutes) = {}'.format(exec_time/60))
+    eval.main(args=parser.parse_args())

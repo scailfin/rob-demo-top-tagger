@@ -42,8 +42,9 @@ if __name__ == '__main__':
 
     The preprocessing step expects four command line parameters:
     - dataset-file (test_jets.pkl)
-    - card-file (jet_image_trim_pt800-900_card.dat)
-    - transformer-file (transformer.pkl)
+    - procrocessing-data-dir containing the default
+        - card-file (jet_image_trim_pt800-900_card.dat)
+        - transformer-file (transformer.pkl)
     - output-dir
 
     Creates two files in the given output directory:
@@ -54,14 +55,15 @@ if __name__ == '__main__':
     # Get the five command line parameters that define the input and output
     # files for the pre-processing step.
     args = sys.argv[1:]
-    if len(args) != 4:
-        msg = 'Usage: {} <dataset-file> <card-file> <transformer-file> <output-dir>'
+    if len(args) != 3:
+        msg = 'Usage: {} <dataset-file> <preproc-data-dir> <output-dir>'
         print(msg.format(sys.argv[0]))
         sys.exit(-1)
     input_jets_file = args[0]
-    card_file = args[1]
-    transformer_file = args[2]
-    out_dir = args[3]
+    data_dir = args[1]
+    out_dir = args[2]
+    card_file = os.path.join(data_dir, fn.CARD_FILE)
+    transformer_file = os.path.join(data_dir, fn.TRANSFORMER_FILE)
     # Ensure that the output directory for preprocessing output file exists
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)

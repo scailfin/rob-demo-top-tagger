@@ -68,7 +68,9 @@ def plot(tagger_results, input_truth_file, start_index, output_file, show_plot=F
         t_name = tagger['name']
         tagger_names.append(t_name)
         with open(tagger['file'], 'rb') as f:
-            tagger_outputs[t_name] = np.asarray(pickle.load(f))
+            r = pickle.load(f)
+            y_prob_best = np.asarray([el['yProbTrue'] for el in r])
+            tagger_outputs[t_name] = y_prob_best[:, :, 0]
     tagger_median = get_median_model(true_labels, tagger_outputs)
     # Shortcut to tagger names and outputs
     base_tpr = np.linspace(0.05, 1, 476)

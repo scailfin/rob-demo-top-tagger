@@ -60,7 +60,7 @@ def generate_results(y_test, y_score, batch_size, output_dir, weights=None):
     # Save fpr, tpr to output file
     output_file = os.path.join(output_dir, fn.ROC_FILE)
     with open(output_file, 'wb') as f:
-        pickle.dump(zip(fpr,tpr), f)
+        pickle.dump(zip(fpr, tpr), f)
     roc_auc = roc_auc_score(y_test, y_score)
     logging.info('roc_auc={}'.format(roc_auc))
     return roc_auc
@@ -134,8 +134,8 @@ def evaluate(
     logging.info('Total Labels={}'.format(labels[0:10]))
     logging.info('Out prob={}'.format(out_prob[0:10]))
     logging.info('------------'*10)
-    logging.info('len labels after ={}'.format(len(labels)))
-    logging.info('len out_prob after{}'.format(len(out_prob)))
+    logging.info('len labels after = {}'.format(len(labels)))
+    logging.info('len out_prob after = {}'.format(len(out_prob)))
     # Get fpr, tpr, ROC curve and AUC
     roc_auc = generate_results(
         y_test=labels,
