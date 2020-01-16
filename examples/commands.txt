@@ -20,7 +20,7 @@ robadm init -f
 robadm benchmarks create \
     -n "ML4Jets - Top Tagger Comparison" \
     -d "The Machine Learning Landscape of Top Taggers" \
-    -i benchmark/instructions.html \
+    -i benchmark/instructions.md \
     -s benchmark/
 flask run
 

@@ -84,17 +84,17 @@ parameters:
 results:
     file: 'results/results.json'
     schema:
-        - id: 'bg_reject_outliers'
+        - id: 'bg_reject'
           name: 'Background rejection (at 50%)'
           type: 'decimal'
-        - id: 'bg_reject_std_outliers'
+        - id: 'bg_reject_std'
           name: 'Background rejection (STD)'
           type: 'decimal'
-        - id: 'aucs_outliers'
+        - id: 'auc'
           name: 'AUC'
           type: 'decimal'
     orderBy:
-        - id: 'bg_reject_outliers'
+        - id: 'bg_reject'
           sortDesc: true
-        - id: 'bg_reject_std_outliers'
+        - id: 'bg_reject_std'
           sortDesc: false

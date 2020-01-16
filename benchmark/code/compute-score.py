@@ -55,10 +55,10 @@ if __name__ == '__main__':
         auc_std_outliers
     ) = analyze.get_median_bg_reject(y_prob_best, true_labels)
     doc = {
-        'bg_reject_outliers': bg_reject_outliers[0],
-        'bg_reject_std_outliers': bg_reject_std_outliers[0],
-        'aucs_outliers': aucs_outliers[0],
-        'auc_std_outliers': auc_std_outliers[0]
+        'bg_reject': bg_reject_outliers[0],
+        'bg_reject_std': bg_reject_std_outliers[0],
+        'auc': aucs_outliers[0],
+        'auc_std': auc_std_outliers[0]
     }
     output_file = os.path.join(results_dir, fn.RESULT_FILE)
     logging.info(json.dumps(doc, indent=4))
