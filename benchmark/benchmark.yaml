@@ -38,11 +38,9 @@ postproc:
         - id: 'ROC-AUC.png'
           name: 'ROC Curves (AUC) for all Algorithms'
           caption: 'ROC curves for all algorithms evaluated on the test sample, shown as the AUC ensemble median of multiple trainings.'
-          type: 'image/png'
         - id: 'ROC-BGR.png'
           name: 'ROC Curves (Background Rejection at Signal Efficiency 50%) for all Algorithms'
           caption: 'ROC curves for all algorithms evaluated on the test sample, shown as the background rejection ensemble median of multiple trainings.'
-          type: 'image/png'
 modules:
     - id: 'preproc'
       name: 'Pre-Processing Step'
