@@ -6,7 +6,7 @@
 # ROB is free software; you can redistribute it and/or modify it under the
 # terms of the MIT License; see LICENSE file for more details.
 
-"""Demo evaluation file for algorithm TreeNiN++."""
+"""Demo evaluation file for the SuperNet algorithm."""
 
 import argparse
 import evaluate_models as eval

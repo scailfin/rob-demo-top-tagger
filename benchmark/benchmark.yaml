@@ -14,7 +14,7 @@ workflow:
           - environment: '$[[env_eval]]'
             commands:
               - '$[[cmd_eval]]'
-          - environment: 'toptagger:1.0'
+          - environment: 'toptaggerdemo:1.0'
             commands:
               - 'python code/compute-score.py data/evaluate/ results/'
     outputs:
@@ -25,7 +25,7 @@ workflow:
        - 'results/evaluate.log'
        - 'results/preproc.log'
 postproc:
-    environment: 'toptagger:1.0'
+    environment: 'toptaggerdemo:1.0'
     mount:
         - 'code/'
         - 'data/'
@@ -54,7 +54,7 @@ parameters:
     - id: 'env_preproc'
       name: 'Environment (Pre-Processing)'
       datatype: 'string'
-      defaultValue: 'toptagger:1.0'
+      defaultValue: 'toptaggerdemo:1.0'
       index: 0
       module: 'preproc'
     - id: 'cmd_preproc'
@@ -69,7 +69,7 @@ parameters:
     - id: 'env_eval'
       name: 'Environment (ML)'
       datatype: 'string'
-      defaultValue: 'toptagger:1.0'
+      defaultValue: 'toptaggerdemo:1.0'
       index: 2
       module: 'eval'
     - id: 'cmd_eval'
