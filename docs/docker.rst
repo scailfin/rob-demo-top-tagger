@@ -6,7 +6,16 @@ Build the container containing the Top Tagger environment:
 
 .. code-block:: bash
 
-    docker image build -t toptagger:1.0 .
+    docker image build -t toptaggerdemo:1.0 .
+
+
+Push container image to DockerHub.
+
+.. code-block:: bash
+
+    docker image tag toptaggerdemo:1.0 heikomueller/toptaggerdemo:1.0
+    docker image push heikomueller/toptaggerdemo:1.0
+
 
 Run workflow steps:
 
@@ -17,11 +26,10 @@ Run workflow steps:
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/benchmark/code:/code \
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/benchmark/data:/data \
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/results:/results \
-        toptagger:1.0 \
+        heikomueller/toptaggerdemo:1.0 \
         python code/preprocess-dataset.py \
             data/test_jets.pkl \
-            data/preprocess/jet_image_trim_pt800-900_card.dat \
-            data/preprocess/transformer.pkl \
+            data/preprocess/ \
             results/
 
     docker container run \
@@ -29,7 +37,7 @@ Run workflow steps:
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/benchmark/code:/code \
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/benchmark/data:/data \
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/results:/results \
-        toptagger:1.0 \
+        heikomueller/toptaggerdemo:1.0 \
         python code/evaluate-models.py \
             results/processed_test_jets.pkl \
             data/evaluate/ \
@@ -40,7 +48,7 @@ Run workflow steps:
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/benchmark/code:/code \
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/benchmark/data:/data \
         -v /home/heiko/projects/scailfin/rob-demo-top-tagger/results:/results \
-        toptagger:1.0 \
-        python code/save-probabilities.py \
+        heikomueller/toptaggerdemo:1.0 \
+        python code/compute-score.py \
             data/evaluate/ \
             results/
