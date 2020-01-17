@@ -90,7 +90,7 @@ Start by registering a new user **alice**. The create a submission for the *Top 
     eval $(rob submissions create -n 'SimpleNet')
 
 
-Create a new benchmark run. In this demo all code files are contained in the repository and can be run using the toptaggerdemo:0.1 Docker container image. Use `python code/SimpleNet.py results/processed_test_jets.pkl data/evaluate/ results/` as the command for the ML step (all other template parameters should use the default values).
+Create a new benchmark run. In this demo all code files are contained in the repository and can be run using the toptaggerdemo:0.1 Docker container image. Use ``python code/SimpleNet.py results/processed_test_jets.pkl data/evaluate/ results/`` as the command for the ML step (all other template parameters should use the default values).
 
 .. code-block:: bash
 
@@ -110,9 +110,49 @@ Once the run completes successful, you can view the current benchmark results.
 Screenshots
 ===========
 
-ROB Home Screen
----------------
+ROB Home Page
+-------------
 
 .. image:: docs/graphics/screen-home.png
     :align: center
-    :alt: ROB Home Screen
+    :alt: ROB Home Screenshot
+
+
+Benchmark Overview
+------------------
+
+.. image:: docs/graphics/screen-benchmark.png
+    :align: center
+    :alt: Benchmark Overview Screenshot
+
+
+Current Benchmark Results
+-------------------------
+
+.. image:: docs/graphics/screen-results.png
+    :align: center
+    :alt: Current Benchmark Results Screenshot
+
+
+Start New Benchmark Run
+-----------------------
+
+.. image:: docs/graphics/screen-run-create.png
+    :align: center
+    :alt: Start New Benchmark Run Screenshot
+
+
+Running Benchmark Status
+------------------------
+
+.. image:: docs/graphics/screen-run-active.png
+    :align: center
+    :alt: Running Benchmark Status Screenshot
+
+
+Successful Benchmark Run
+------------------------
+
+.. image:: docs/graphics/screen-run-success.png
+    :align: center
+    :alt: Successful Benchmark Run Screenshot
