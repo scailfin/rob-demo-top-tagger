@@ -25,7 +25,7 @@ workflow:
        - 'results/evaluate.log'
        - 'results/preproc.log'
 postproc:
-    environment: 'toptaggerdemo:1.0'
+    environment: 'heikomueller/toptaggerdemo:1.0'
     mount:
         - 'code/'
         - 'data/'
