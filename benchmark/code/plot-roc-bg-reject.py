@@ -10,6 +10,8 @@ import json
 import os
 import sys
 
+from flowserv.service.postproc.client import Runs
+
 import plot as plt
 
 
@@ -27,12 +29,10 @@ if __name__ == '__main__':
     input_truth_file = args[1]
     out_dir = args[2]
     # Read the submission information
-    with open(os.path.join(args[0], 'submissions.json'), 'r') as f:
-        submissions = json.load(f)
     results = list()
-    for s in submissions:
-        filename = os.path.join(in_dir, s['id'], 'results/yProbBest.pkl')
-        results.append({'name': s['name'], 'file': filename})
+    for run in Runs(in_dir):
+        filename = run.get_file('results/yProbBest.pkl')
+        results.append({'name': run.name, 'file': filename})
     # [{'name': 'TreeNiN', 'file': args[0]}]
     plt.plot(
         tagger_results=results,
