@@ -1,0 +1,26 @@
+version: '0.3.0'
+inputs:
+  files:
+    - 'code/'
+    - 'data/'
+workflow:
+  type: 'serial'
+  specification:
+    steps:
+      - environment: 'heikomueller/toptaggerdemo:1.0'
+        commands:
+          - 'python code/preprocess-dataset.py data/test_jets.pkl data/preprocess/ results/'
+      - environment: 'heikomueller/toptaggerdemo:1.0'
+        commands:
+          - 'python code/TreeNiN.py results/processed_test_jets.pkl data/evaluate/ results/'
+      - environment: 'heikomueller/toptaggerdemo:1.0'
+        commands:
+          - 'python code/compute-score.py data/evaluate/ results/'
+outputs:
+  files:
+   - 'results/yProbBest.pkl'
+   - 'results/results.json'
+   - 'results/analyze.log'
+   - 'results/evaluate.log'
+   - 'results/preproc.log'
+
