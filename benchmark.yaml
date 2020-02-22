@@ -14,7 +14,7 @@ workflow:
           - environment: '$[[env_eval]]'
             commands:
               - '$[[cmd_eval]]'
-          - environment: 'heikomueller/toptaggerdemo:1.0'
+          - environment: 'heikomueller/toptaggerdemo:1.1'
             commands:
               - 'python code/compute-score.py data/evaluate/ results/'
     outputs:
@@ -38,7 +38,7 @@ postproc:
           type: serial
           specification:
             steps:
-              - environment: 'heikomueller/toptaggerdemo:1.0'
+              - environment: 'heikomueller/toptaggerdemo:1.1'
                 commands:
                     - 'python code/plot-roc-auc.py "${rundir}" data/evaluate/labels.pkl results/'
                     - 'python code/plot-roc-bg-reject.py "${rundir}" data/evaluate/labels.pkl results/'
@@ -68,7 +68,7 @@ parameters:
     - id: 'env_preproc'
       name: 'Environment (Pre-Processing)'
       datatype: 'string'
-      defaultValue: 'heikomueller/toptaggerdemo:1.0'
+      defaultValue: 'heikomueller/toptaggerdemo:1.1'
       index: 0
       module: 'preproc'
     - id: 'cmd_preproc'
@@ -83,7 +83,7 @@ parameters:
     - id: 'env_eval'
       name: 'Environment (ML)'
       datatype: 'string'
-      defaultValue: 'heikomueller/toptaggerdemo:1.0'
+      defaultValue: 'heikomueller/toptaggerdemo:1.1'
       index: 2
       module: 'eval'
     - id: 'cmd_eval'

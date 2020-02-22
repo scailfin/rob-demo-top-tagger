@@ -1,0 +1,9 @@
+name: 'Top Tagger Demo - ML4Jets'
+description: 'ROB Demo for the Machine Learning Landscape of Top Taggers Comparison'
+instructions: 'instructions.md'
+files:
+    - source: 'benchmark/code'
+      target: 'code'
+    - source: 'benchmark/data'
+      target: 'data'
+specfile: 'benchmark.yaml'
