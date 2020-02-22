@@ -25,20 +25,36 @@ workflow:
        - 'results/evaluate.log'
        - 'results/preproc.log'
 postproc:
-    environment: 'heikomueller/toptaggerdemo:1.0'
-    mount:
-        - 'code/'
-        - 'data/'
+    workflow:
+        version: 0.3.0
+        inputs:
+          files:
+            - 'code'
+            - 'data/evaluate/labels.pkl'
+            - $[[runs]]
+          parameters:
+            rundir: $[[runs]]
+        workflow:
+          type: serial
+          specification:
+            steps:
+              - environment: 'heikomueller/toptaggerdemo:1.0'
+                commands:
+                    - 'python code/plot-roc-auc.py "${rundir}" data/evaluate/labels.pkl results/'
+                    - 'python code/plot-roc-bg-reject.py "${rundir}" data/evaluate/labels.pkl results/'
+        outputs:
+            files:
+                - 'results/ROC-AUC.png'
+                - 'results/ROC-BGR.png'
     inputs:
-        - 'results/yProbBest.pkl'
-    commands:
-        - 'python code/plot-roc-auc.py ${in} data/evaluate/labels.pkl ${out}'
-        - 'python code/plot-roc-bg-reject.py ${in} data/evaluate/labels.pkl ${out}'
+        files:
+            - 'results/yProbBest.pkl'
+        runs: 'runs/'
     outputs:
-        - id: 'ROC-AUC.png'
+        - id: 'results/ROC-AUC.png'
           name: 'ROC Curves (AUC) for all Algorithms'
           caption: 'ROC curves for all algorithms evaluated on the test sample, shown as the AUC ensemble median of multiple trainings.'
-        - id: 'ROC-BGR.png'
+        - id: 'results/ROC-BGR.png'
           name: 'ROC Curves (Background Rejection at Signal Efficiency 50%) for all Algorithms'
           caption: 'ROC curves for all algorithms evaluated on the test sample, shown as the background rejection ensemble median of multiple trainings.'
 modules:
