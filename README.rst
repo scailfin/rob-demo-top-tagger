@@ -23,20 +23,20 @@ Getting Started
 
 The demo requires an instance of the `ROB Web Service <https://github.com/scailfin/rob-webapi-flask/>`_ and the `ROB Command Line Interface <https://github.com/scailfin/rob-client/>`_. You can follow the instructions on the `Flask Web API - Demo Setup site <https://github.com/scailfin/rob-webapi-flask/blob/master/docs/demo-setup.rst>`_ to setup and run the Web API. The `ROB Command Line Interface <https://github.com/scailfin/rob-client/>`_ page contains information to install the client.
 
-Use the ``robadm`` command line client from the Web API to create a new benchmark. Make sure to set the environment variables that configure the database accordingly, e.g.,:
+Use the ``flowserv`` command line to create a new benchmark. Make sure to set the environment variables that configure the database accordingly, e.g.,:
 
 .. code-block:: bash
 
-    export ROB_DBMS=SQLITE3
-    export SQLITE_ROB_CONNECT=./.rob/db.sqlite
+    export FLOWSERV_DBMS=SQLITE3
+    export SQLITE_FLOWSERV_CONNECT=./.rob/db.sqlite
 
 
 This demo does not use the default workflow controller. It uses the Docker-based controller instead. To configure the Web API accordingly, set the following environment variables:
 
 .. code-block:: bash
 
-    export ROB_ENGINE_CLASS=DockerWorkflowEngine
-    export ROB_ENGINE_MODULE=robcore.controller.backend.docker
+    export FLOWSERV_BACKEND_CLASS=DockerWorkflowEngine
+    export FLOWSERV_BACKEND_MODULE=flowserv.controller.docker
 
 
 .. note:: This demo requires an installed and running Docker daemon.
@@ -54,11 +54,7 @@ The following commands will download the demo and register it as a new benchmark
 .. code-block:: bash
 
     git clone https://github.com/scailfin/rob-demo-top-tagger.git
-    robadm benchmarks create \
-        -n "ML4Jets - Top Tagger Comparison" \
-        -d "The Machine Learning Landscape of Top Taggers" \
-        -i rob-demo-top-tagger/benchmark/instructions.md \
-        -s rob-demo-top-tagger/benchmark/
+    flowserv workflows create -s rob-demo-top-tagger
 
 
 Run the Benchmark
