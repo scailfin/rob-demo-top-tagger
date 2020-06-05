@@ -42,7 +42,7 @@ This demo does not use the default workflow controller. It uses the Docker-based
 .. note:: This demo requires an installed and running Docker daemon.
 
 
-If the Web API is otherwise running on your local machine with the default settings there is no need to configure additional environment variables. If the Web API is running on a different machine or port, for example, set the environment variables **ROB_API_HOST**, **ROB_API_PORT**, and **ROB_API_PATH** accordingly (see `the documentation <https://github.com/scailfin/rob-core/blob/master/docs/configuration.rst>`_ for details).
+If the Web API is otherwise running on your local machine with the default settings there is no need to configure additional environment variables. If the Web API is running on a different machine or port, for example, set the environment variables **FLOWSERV_API_HOST**, **FLOWSERV_API_PORT**, and **FLOWSERV_API_PATH** accordingly (see `the documentation <https://github.com/scailfin/rob-core/blob/master/docs/configuration.rst>`_ for details).
 
 
 
