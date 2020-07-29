@@ -75,6 +75,7 @@ target/
 
 # Benchmark run outputs
 results/
+benchmark/results/
 
 config/localdev
 .rob
