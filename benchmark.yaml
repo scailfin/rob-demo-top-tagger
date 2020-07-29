@@ -67,13 +67,13 @@ modules:
 parameters:
     - id: 'env_preproc'
       name: 'Environment (Pre-Processing)'
-      datatype: 'string'
+      type: 'string'
       defaultValue: 'heikomueller/toptaggerdemo:1.1'
       index: 0
       module: 'preproc'
     - id: 'cmd_preproc'
       name: 'Command  (Pre-Processing)'
-      datatype: 'string'
+      type: 'string'
       defaultValue: 'python code/preprocess-dataset.py
         data/test_jets.pkl
         data/preprocess/
@@ -82,13 +82,13 @@ parameters:
       module: 'preproc'
     - id: 'env_eval'
       name: 'Environment (ML)'
-      datatype: 'string'
+      type: 'string'
       defaultValue: 'heikomueller/toptaggerdemo:1.1'
       index: 2
       module: 'eval'
     - id: 'cmd_eval'
       name: 'Command (ML)'
-      datatype: 'string'
+      type: 'string'
       defaultValue: 'python code/your_script.py
         results/processed_test_jets.pkl
         data/evaluate/
@@ -100,13 +100,13 @@ results:
     schema:
         - id: 'bg_reject'
           name: 'Background rejection (at 50%)'
-          type: 'decimal'
+          type: 'float'
         - id: 'bg_reject_std'
           name: 'Background rejection (STD)'
-          type: 'decimal'
+          type: 'float'
         - id: 'auc'
           name: 'AUC'
-          type: 'decimal'
+          type: 'float'
     orderBy:
         - id: 'bg_reject'
           sortDesc: true
