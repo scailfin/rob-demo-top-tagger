@@ -51,12 +51,16 @@ postproc:
             - 'results/yProbBest.pkl'
         runs: 'runs/'
     outputs:
-        - id: 'results/ROC-AUC.png'
-          name: 'ROC Curves (AUC) for all Algorithms'
+        - source: 'results/ROC-AUC.png'
+          title: 'ROC Curves (AUC) for all Algorithms'
           caption: 'ROC curves for all algorithms evaluated on the test sample, shown as the AUC ensemble median of multiple trainings.'
-        - id: 'results/ROC-BGR.png'
-          name: 'ROC Curves (Background Rejection at Signal Efficiency 50%) for all Algorithms'
+          format:
+              type: 'image'
+        - source: 'results/ROC-BGR.png'
+          title: 'ROC Curves (Background Rejection at Signal Efficiency 50%) for all Algorithms'
           caption: 'ROC curves for all algorithms evaluated on the test sample, shown as the background rejection ensemble median of multiple trainings.'
+          format:
+              type: 'image'
 modules:
     - id: 'preproc'
       name: 'Pre-Processing Step'
@@ -67,13 +71,13 @@ modules:
 parameters:
     - id: 'env_preproc'
       name: 'Environment (Pre-Processing)'
-      type: 'string'
+      dtype: 'string'
       defaultValue: 'heikomueller/toptaggerdemo:0.2.0'
       index: 0
       module: 'preproc'
     - id: 'cmd_preproc'
       name: 'Command  (Pre-Processing)'
-      type: 'string'
+      dtype: 'string'
       defaultValue: 'python code/preprocess-dataset.py
         data/test_jets.pkl
         data/preprocess/
@@ -82,13 +86,13 @@ parameters:
       module: 'preproc'
     - id: 'env_eval'
       name: 'Environment (ML)'
-      type: 'string'
+      dtype: 'string'
       defaultValue: 'heikomueller/toptaggerdemo:0.2.0'
       index: 2
       module: 'eval'
     - id: 'cmd_eval'
       name: 'Command (ML)'
-      type: 'string'
+      dtype: 'string'
       defaultValue: 'python code/your_script.py
         results/processed_test_jets.pkl
         data/evaluate/
@@ -100,13 +104,13 @@ results:
     schema:
         - id: 'bg_reject'
           name: 'Background rejection (at 50%)'
-          type: 'float'
+          dtype: 'float'
         - id: 'bg_reject_std'
           name: 'Background rejection (STD)'
-          type: 'float'
+          dtype: 'float'
         - id: 'auc'
           name: 'AUC'
-          type: 'float'
+          dtype: 'float'
     orderBy:
         - id: 'bg_reject'
           sortDesc: true
