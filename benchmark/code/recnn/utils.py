@@ -41,7 +41,9 @@ class Params():
 
     @property
     def dict(self):
-        """Gives dict-like access to Params instance by `params.dict['learning_rate']"""
+        """Gives dict-like access to Params instance by
+        `params.dict['learning_rate']
+        """
         return self.__dict__
 
 
@@ -70,8 +72,10 @@ class RunningAverage():
 
 def set_logger(log_path):
     """Set the logger to log info in terminal and file `log_path`.
-    In general, it is useful to have a logger so that every output to the terminal is saved
-    in a permanent file. Here we save it to `model_dir/train.log`.
+    In general, it is useful to have a logger so that every output to the
+    terminal is saved in a permanent file. Here we save it to
+    `model_dir/train.log`.
+
     Example:
     ```
     logging.info("Starting training...")
@@ -85,7 +89,9 @@ def set_logger(log_path):
     if not logger.handlers:
         # Logging to a file
         file_handler = logging.FileHandler(log_path)
-        file_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s: %(message)s'))
+        file_handler.setFormatter(
+            logging.Formatter('%(asctime)s:%(levelname)s: %(message)s')
+        )
         logger.addHandler(file_handler)
 
         # Logging to console
@@ -101,7 +107,8 @@ def save_dict_to_json(d, json_path):
         json_path: (string) path to json file
     """
     with open(json_path, 'w') as f:
-        # We need to convert the values to float for json (it doesn't accept np.array, np.float, )
+        # We need to convert the values to float for json (it doesn't accept
+        # np.array, np.float, )
         d = {k: float(v) for k, v in d.items()}
         json.dump(d, f, indent=4)
 
@@ -113,21 +120,24 @@ def save_dict_list_to_json(d, json_path):
         json_path: (string) path to json file
     """
     with open(json_path, 'w') as f:
-        # We need to convert the values to float for json (it doesn't accept np.array, np.float, )
-#         d = {k: float(v) for k, v in d.items()}
+        # We need to convert the values to float for json (it doesn't accept
+        # np.array, np.float, )
         json.dump(d, f, indent=4)
 
+
 def save_checkpoint(state, is_best, checkpoint):
-    """Saves model and training parameters at checkpoint + 'last.pth.tar'. If is_best==True, also saves
-    checkpoint + 'best.pth.tar'
+    """Saves model and training parameters at checkpoint + 'last.pth.tar'. If
+    is_best==True, also saves checkpoint + 'best.pth.tar'
+
     Args:
-        state: (dict) contains model's state_dict, may contain other keys such as epoch, optimizer state_dict
-        is_best: (bool) True if it is the best model seen till now
+        state: (dict) contains model's state_dict, may contain other keys such
+        as epoch, optimizer state_dict is_best: (bool) True if it is the best
+        model seen till now
         checkpoint: (string) folder where parameters are to be saved
     """
     filepath = os.path.join(checkpoint, 'last.pth.tar')
     if not os.path.exists(checkpoint):
-        print("Checkpoint Directory does not exist! Making directory {}".format(checkpoint))
+        print("Checkpoint Directory does not exist! Making directory {}".format(checkpoint))  # noqa: E501
         os.mkdir(checkpoint)
     else:
         print("Checkpoint Directory exists! ")
@@ -137,8 +147,10 @@ def save_checkpoint(state, is_best, checkpoint):
 
 
 def load_checkpoint(checkpoint, model, optimizer=None):
-    """Loads model parameters (state_dict) from file_path. If optimizer is provided, loads state_dict of
-    optimizer assuming it is present in checkpoint.
+    """Loads model parameters (state_dict) from file_path. If optimizer is
+    provided, loads state_dict of optimizer assuming it is present in
+    checkpoint.
+
     Args:
         checkpoint: (string) filename which needs to be loaded
         model: (torch.nn.Module) model for which the parameters are loaded
@@ -147,15 +159,14 @@ def load_checkpoint(checkpoint, model, optimizer=None):
     if not os.path.exists(checkpoint):
         raise ValueError("File doesn't exist {}".format(checkpoint))
 
-
     if torch.cuda.is_available():
-      checkpoint = torch.load(checkpoint)
-      model.load_state_dict(checkpoint['state_dict'])
+        checkpoint = torch.load(checkpoint)
+        model.load_state_dict(checkpoint['state_dict'])
     else:
-      device= torch.device('cpu')
-      model.load_state_dict(torch.load(checkpoint, map_location=device)['state_dict'])
-
-
+        device = torch.device('cpu')
+        model.load_state_dict(
+            torch.load(checkpoint, map_location=device)['state_dict']
+        )
 
     if optimizer:
         optimizer.load_state_dict(checkpoint['optim_dict'])

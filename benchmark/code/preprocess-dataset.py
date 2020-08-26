@@ -31,14 +31,15 @@ import files as fn
 import recnn.preprocess as recnn
 
 
-# -- Main Function -------------------------------------------------------------
+# -- Main Function ------------------------------------------------------------
 
 if __name__ == '__main__':
     """Create the input trees. Load and recluster the jet constituents. Create
-    binary trees with the clustering history of the jets and output a dictionary
-    for each jet that contains the root_id, tree, content (constituents
-    4-momentum vectors), mass, pT, energy, eta and phi values (also charge,
-    muon ID, etc depending on the information contained in the dataset).
+    binary trees with the clustering history of the jets and output a
+    dictionary for each jet that contains the root_id, tree, content
+    (constituents 4-momentum vectors), mass, pT, energy, eta and phi values
+    (also charge, muon ID, etc depending on the information contained in the
+    dataset).
 
     The preprocessing step expects four command line parameters:
     - dataset-file (test_jets.pkl)
@@ -74,7 +75,7 @@ if __name__ == '__main__':
     log.addHandler(logging.FileHandler(log_file))
     log.setLevel(logging.DEBUG)
     #
-    # -- Step 1 ----------------------------------------------------------------
+    # -- Step 1 ---------------------------------------------------------------
     # Run jets preprocessing task that uses FastJet to create the tree test
     # jets.
     #
@@ -85,7 +86,7 @@ if __name__ == '__main__':
         out_file=tree_file
     )
     #
-    # -- Step 2 ----------------------------------------------------------------
+    # -- Step 2 ---------------------------------------------------------------
     # Apply preprocessing: get the initial 7 features: p, eta, phi, E, E/JetE,
     # pT, theta. Apply RobustScaler
     #

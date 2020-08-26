@@ -15,7 +15,6 @@ usage: evaluate-models.py [-h] [-a ARCHITECTURE] [-r RESTORE] [-s N_START]
 """
 
 import argparse
-import json
 import logging
 import numpy as np
 import os
@@ -91,8 +90,8 @@ def main(args):
     with open(output_file, 'wb') as f:
         pickle.dump(results[:, :, 0], f)
     # Log runtime information
-    exec_time = time.time()-start_time
-    logging.info('Preprocessing time (minutes) = {}'.format(exec_time/60))
+    exec_time = time.time() - start_time
+    logging.info('Preprocessing time (minutes) = {}'.format(exec_time / 60))
 
 
 if __name__ == '__main__':
