@@ -69,50 +69,50 @@ modules:
       name: 'ML Evaluation Step'
       index: 1
 parameters:
-    - id: 'env_preproc'
-      name: 'Environment (Pre-Processing)'
+    - name: 'env_preproc'
+      label: 'Environment (Pre-Processing)'
       dtype: 'string'
       defaultValue: 'heikomueller/toptaggerdemo:0.2.0'
       index: 0
-      module: 'preproc'
-    - id: 'cmd_preproc'
-      name: 'Command  (Pre-Processing)'
+      group: 'preproc'
+    - name: 'cmd_preproc'
+      label: 'Command  (Pre-Processing)'
       dtype: 'string'
       defaultValue: 'python code/preprocess-dataset.py
         data/test_jets.pkl
         data/preprocess/
         results/'
       index: 1
-      module: 'preproc'
-    - id: 'env_eval'
-      name: 'Environment (ML)'
+      group: 'preproc'
+    - name: 'env_eval'
+      label: 'Environment (ML)'
       dtype: 'string'
       defaultValue: 'heikomueller/toptaggerdemo:0.2.0'
       index: 2
-      module: 'eval'
-    - id: 'cmd_eval'
-      name: 'Command (ML)'
+      group: 'eval'
+    - name: 'cmd_eval'
+      label: 'Command (ML)'
       dtype: 'string'
       defaultValue: 'python code/your_script.py
         results/processed_test_jets.pkl
         data/evaluate/
         results/'
       index: 3
-      module: 'eval'
+      group: 'eval'
 results:
     file: 'results/results.json'
     schema:
-        - id: 'bg_reject'
-          name: 'Background rejection (at 50%)'
+        - name: 'bg_reject'
+          label: 'Background rejection (at 50%)'
           dtype: 'float'
-        - id: 'bg_reject_std'
-          name: 'Background rejection (STD)'
+        - name: 'bg_reject_std'
+          label: 'Background rejection (STD)'
           dtype: 'float'
-        - id: 'auc'
-          name: 'AUC'
+        - name: 'auc'
+          label: 'AUC'
           dtype: 'float'
     orderBy:
-        - id: 'bg_reject'
+        - name: 'bg_reject'
           sortDesc: true
-        - id: 'bg_reject_std'
+        - name: 'bg_reject_std'
           sortDesc: false
