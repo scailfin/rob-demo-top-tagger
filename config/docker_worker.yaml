@@ -1,0 +1,2 @@
+- image: 'heikomueller/toptaggerdemo:0.2.0'
+  worker: 'docker'
