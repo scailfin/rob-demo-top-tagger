@@ -8,12 +8,8 @@ workflow:
       type: 'serial'
       specification:
         steps:
-          - environment: '$[[env_preproc]]'
-            commands:
-              - '$[[cmd_preproc]]'
-          - environment: '$[[env_eval]]'
-            commands:
-              - '$[[cmd_eval]]'
+          - $[[preproc]]
+          - $[[tagger]]
           - environment: 'heikomueller/toptaggerdemo:0.2.0'
             commands:
               - 'python code/compute-score.py data/evaluate/ results/'
@@ -24,6 +20,16 @@ workflow:
        - 'results/analyze.log'
        - 'results/evaluate.log'
        - 'results/preproc.log'
+outputs:
+    - source: 'results/results.json'
+      title: 'Results'
+      caption: 'Top-tagger evaluation results.'
+      format:
+          type: 'json'
+    - source: 'results/yProbBest.pkl'
+    - source: 'results/analyze.log'
+    - source: 'results/evaluate.log'
+    - source: 'results/preproc.log'
 postproc:
     workflow:
         version: 0.3.0
@@ -61,58 +67,46 @@ postproc:
           caption: 'ROC curves for all algorithms evaluated on the test sample, shown as the background rejection ensemble median of multiple trainings.'
           format:
               type: 'image'
-modules:
-    - id: 'preproc'
-      name: 'Pre-Processing Step'
-      index: 0
-    - id: 'eval'
-      name: 'ML Evaluation Step'
-      index: 1
 parameters:
-    - id: 'env_preproc'
-      name: 'Environment (Pre-Processing)'
+    - name: 'preproc'
+      label: 'Pre-Processing Step'
       dtype: 'string'
-      defaultValue: 'heikomueller/toptaggerdemo:0.2.0'
+      dtype: 'actor'
+      defaultValue:
+          - 'container'
+          - image: 'heikomueller/toptaggerdemo:0.2.0'
+            commands:
+                - 'python code/preprocess-dataset.py
+                  data/test_jets.pkl
+                  data/preprocess/
+                  results/'
       index: 0
-      module: 'preproc'
-    - id: 'cmd_preproc'
-      name: 'Command  (Pre-Processing)'
-      dtype: 'string'
-      defaultValue: 'python code/preprocess-dataset.py
-        data/test_jets.pkl
-        data/preprocess/
-        results/'
+    - name: 'tagger'
+      label: 'Top-Tagger Step'
+      dtype: 'actor'
+      defaultValue:
+          - 'container'
+          - image: 'heikomueller/toptaggerdemo:0.2.0'
+            commands:
+                - 'python code/your_script.py
+                  results/processed_test_jets.pkl
+                  data/evaluate/
+                  results/'
       index: 1
-      module: 'preproc'
-    - id: 'env_eval'
-      name: 'Environment (ML)'
-      dtype: 'string'
-      defaultValue: 'heikomueller/toptaggerdemo:0.2.0'
-      index: 2
-      module: 'eval'
-    - id: 'cmd_eval'
-      name: 'Command (ML)'
-      dtype: 'string'
-      defaultValue: 'python code/your_script.py
-        results/processed_test_jets.pkl
-        data/evaluate/
-        results/'
-      index: 3
-      module: 'eval'
 results:
     file: 'results/results.json'
     schema:
-        - id: 'bg_reject'
-          name: 'Background rejection (at 50%)'
+        - name: 'bg_reject'
+          label: 'Background rejection (at 50%)'
           dtype: 'float'
-        - id: 'bg_reject_std'
-          name: 'Background rejection (STD)'
+        - name: 'bg_reject_std'
+          label: 'Background rejection (STD)'
           dtype: 'float'
-        - id: 'auc'
-          name: 'AUC'
+        - name: 'auc'
+          label: 'AUC'
           dtype: 'float'
     orderBy:
-        - id: 'bg_reject'
+        - name: 'bg_reject'
           sortDesc: true
-        - id: 'bg_reject_std'
+        - name: 'bg_reject_std'
           sortDesc: false
