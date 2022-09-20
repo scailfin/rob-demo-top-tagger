@@ -1,25 +1,52 @@
 workflow:
-    version: '0.3.0'
-    inputs:
-      files:
+    files:
+        inputs:
         - 'code/'
         - 'data/'
-    workflow:
-      type: 'serial'
-      specification:
-        steps:
-          - $[[preproc]]
-          - $[[tagger]]
-          - environment: 'heikomueller/toptaggerdemo:0.2.0'
+        outputs:
+        - 'results/yProbBest.pkl'
+        - 'results/results.json'
+        - 'results/analyze.log'
+        - 'results/evaluate.log'
+        - 'results/preproc.log'
+    parameters:
+        preproc: $[[preproc]]
+        tagger: $[[tagger]]
+    steps:
+        - name: 'pre-processor'
+          files:
+            inputs:
+            - 'code/'
+            - 'data/'
+            outputs:
+            - 'results/processed_test_jets.pkl'
+            - 'results/preproc.log'
+          action: $[[preproc]]
+        - name: 'top-tagger'
+          files:
+            inputs:
+            - 'code/'
+            - 'data/'
+            - 'results/processed_test_jets.pkl'
+            outputs:
+            - 'results/yProbBest.pkl'
+            - 'results/analyze.log'
+          action: $[[tagger]]
+        - name: 'evaluate-models'
+          files:
+            inputs:
+            - 'code/'
+            - 'data/'
+            - 'results/yProbBest.pkl'
+            outputs:
+            - 'results/results.json'
+            - 'results/evaluate.log'
+          action:
+            environment: 'heikomueller/toptaggerdemo:0.2.0'
             commands:
-              - 'python code/compute-score.py data/evaluate/ results/'
-    outputs:
-      files:
-       - 'results/yProbBest.pkl'
-       - 'results/results.json'
-       - 'results/analyze.log'
-       - 'results/evaluate.log'
-       - 'results/preproc.log'
+            - $[[preproc]]
+            - $[[tagger]]
+            - 'python code/compute-score.py data/evaluate/ results/'
 outputs:
     - source: 'results/results.json'
       title: 'Results'
@@ -32,26 +59,31 @@ outputs:
     - source: 'results/preproc.log'
 postproc:
     workflow:
-        version: 0.3.0
-        inputs:
-          files:
+        files:
+            inputs:
             - 'code'
             - 'data/evaluate/labels.pkl'
-            - $[[runs]]
-          parameters:
-            rundir: $[[runs]]
-        workflow:
-          type: serial
-          specification:
-            steps:
-              - environment: 'heikomueller/toptaggerdemo:0.2.0'
+            - 'runs/'
+            outputs:
+            - 'results/ROC-AUC.png'
+            - 'results/ROC-BGR.png'
+        parameters:
+          rundir: 'runs/'
+        steps:
+          - name: 'update-results'
+            files:
+                inputs:
+                - 'code'
+                - 'data/evaluate/labels.pkl'
+                - 'runs/'
+                outputs:
+                - 'results/ROC-AUC.png'
+                - 'results/ROC-BGR.png'
+            action:
+                environment: 'heikomueller/toptaggerdemo:0.2.0'
                 commands:
                     - 'python code/plot-roc-auc.py "${rundir}" data/evaluate/labels.pkl results/'
                     - 'python code/plot-roc-bg-reject.py "${rundir}" data/evaluate/labels.pkl results/'
-        outputs:
-            files:
-                - 'results/ROC-AUC.png'
-                - 'results/ROC-BGR.png'
     inputs:
         files:
             - 'results/yProbBest.pkl'
@@ -74,7 +106,7 @@ parameters:
       dtype: 'actor'
       defaultValue:
           - 'container'
-          - image: 'heikomueller/toptaggerdemo:0.2.0'
+          - environment: 'heikomueller/toptaggerdemo:0.2.0'
             commands:
                 - 'python code/preprocess-dataset.py
                   data/test_jets.pkl
@@ -86,7 +118,7 @@ parameters:
       dtype: 'actor'
       defaultValue:
           - 'container'
-          - image: 'heikomueller/toptaggerdemo:0.2.0'
+          - environment: 'heikomueller/toptaggerdemo:0.2.0'
             commands:
                 - 'python code/your_script.py
                   results/processed_test_jets.pkl
