@@ -32,7 +32,7 @@ workflow:
             - 'results/yProbBest.pkl'
             - 'results/analyze.log'
           action: $[[tagger]]
-        - name: 'evaluate-models'
+        - name: 'model-evaluater'
           files:
             inputs:
             - 'code/'
@@ -44,8 +44,6 @@ workflow:
           action:
             environment: 'heikomueller/toptaggerdemo:0.2.0'
             commands:
-            - $[[preproc]]
-            - $[[tagger]]
             - 'python code/compute-score.py data/evaluate/ results/'
 outputs:
     - source: 'results/results.json'
